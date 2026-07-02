@@ -301,7 +301,7 @@ export const SELLERS: Seller[] = [
     cardImageUrl: '/assets/sellers/jewellery.jpg',
     cardBg: 'var(--pastel-cream)',
     showTitle: 'Jewellery Auction',
-    thumbnailUrl: '/assets/thumbnails/jewellery.jpg',
+    thumbnailUrl: '/assets/seller/jewellery.png',
     pinnedName: 'Premium Traditional Gold Necklace Set',
     pinnedPrice: 2499,
   },
@@ -324,7 +324,7 @@ export const SELLERS: Seller[] = [
     cardImageUrl: '/assets/sellers/saree.jpg',
     cardBg: 'var(--pastel-lavender)',
     showTitle: 'Silk Saree Showcase',
-    thumbnailUrl: '/assets/thumbnails/saree.jpg',
+    thumbnailUrl: '/assets/seller/saree.png',
     pinnedName: 'Banarasi Silk Saree',
     pinnedPrice: 1299,
   },
@@ -347,7 +347,7 @@ export const SELLERS: Seller[] = [
     cardImageUrl: '/assets/sellers/kurti.jpg',
     cardBg: 'var(--pastel-peach)',
     showTitle: 'Kurti Try-On Live',
-    thumbnailUrl: '/assets/thumbnails/kurti.jpg',
+    thumbnailUrl: '/assets/seller/kurti.png',
     pinnedName: 'Lavender Embroidered Cotton Kurti',
     pinnedPrice: 899,
   },
@@ -370,7 +370,7 @@ export const SELLERS: Seller[] = [
     cardImageUrl: '/assets/sellers/accessories.jpg',
     cardBg: 'var(--pastel-mint)',
     showTitle: 'Watch Auction',
-    thumbnailUrl: '/assets/thumbnails/watch.jpg',
+    thumbnailUrl: '/assets/seller/watch.png',
     pinnedName: 'Fossil Grant Chronograph Watch',
     pinnedPrice: 2499,
   },
@@ -393,7 +393,7 @@ export const SELLERS: Seller[] = [
     cardImageUrl: '/assets/sellers/lehenga.jpg',
     cardBg: 'var(--pastel-rose)',
     showTitle: 'Bags & Purses Live',
-    thumbnailUrl: '/assets/thumbnails/bags.jpg',
+    thumbnailUrl: '/assets/seller/bags.png',
     pinnedName: 'Michael Kors Jet Set Tote Bag',
     pinnedPrice: 2599,
   },
@@ -455,13 +455,13 @@ export interface ShopProduct {
   material: Material;
 }
 
-// One item per product type — images at /assets/shop/<type>.jpg (swatch fallback until added).
+// One item per product type — images at /assets/shop/<type>.png (swatch fallback until added).
 export const SHOP_PRODUCTS: ShopProduct[] = [
-  { id: 'sp-bag', name: 'Lavender Textured Handbag', category: 'Bags', price: 1999, imageUrl: '/assets/shop/bags.jpg', material: 'amethyst' },
-  { id: 'sp-earrings', name: 'Pearl Bow Stud Earrings', category: 'Jewellery', price: 1999, imageUrl: '/assets/shop/jewellery.jpg', material: 'gold' },
-  { id: 'sp-saree', name: 'Blush Organza Saree', category: 'Saree', price: 1999, imageUrl: '/assets/shop/saree.jpg', material: 'pearl' },
-  { id: 'sp-watch', name: 'Fastrack Minimal Steel Watch', category: 'Watch', price: 1999, imageUrl: '/assets/shop/watch.jpg', material: 'silver' },
-  { id: 'sp-kurti', name: 'Sky Blue Embroidered Kurti Set', category: 'Kurti', price: 1999, imageUrl: '/assets/shop/kurti.jpg', material: 'sapphire' },
+  { id: 'sp-bag', name: 'Lavender Textured Handbag', category: 'Bags', price: 1999, imageUrl: '/assets/shop/bags.png', material: 'amethyst' },
+  { id: 'sp-earrings', name: 'Pearl Bow Stud Earrings', category: 'Jewellery', price: 1999, imageUrl: '/assets/shop/jewellery.png', material: 'gold' },
+  { id: 'sp-saree', name: 'Blush Organza Saree', category: 'Saree', price: 1999, imageUrl: '/assets/shop/saree.png', material: 'pearl' },
+  { id: 'sp-watch', name: 'Fastrack Minimal Steel Watch', category: 'Watch', price: 1999, imageUrl: '/assets/shop/watch.png', material: 'silver' },
+  { id: 'sp-kurti', name: 'Sky Blue Embroidered Kurti Set', category: 'Kurti', price: 1999, imageUrl: '/assets/shop/kurti.png', material: 'sapphire' },
 ];
 
 /* ---------------- chat bots ---------------- */
