@@ -444,40 +444,24 @@ export const SHOP_CATEGORIES: ShopCategory[] = [
 
 /* ---------------- shop products (buy-now, prices in ₹, keyed by type) ---------------- */
 
+export type ShopCategoryName = 'Jewellery' | 'Saree' | 'Kurti' | 'Watch' | 'Bags';
+
 export interface ShopProduct {
   id: string;
   name: string;
-  category: 'Saree' | 'Kurti' | 'Jewellery' | 'Accessories';
+  category: ShopCategoryName;
   price: number; // whole rupees
   imageUrl: string;
   material: Material;
 }
 
-// Price bands per type keep values believable: sarees > jewellery > kurtis > accessories.
+// One item per product type — images at /assets/shop/<type>.jpg (swatch fallback until added).
 export const SHOP_PRODUCTS: ShopProduct[] = [
-  // Sarees
-  { id: 'sp-banarasi', name: 'Banarasi Silk Saree', category: 'Saree', price: 4999, imageUrl: '/assets/sellers/saree.jpg', material: 'ruby' },
-  { id: 'sp-kanjeevaram', name: 'Kanjeevaram Zari Saree', category: 'Saree', price: 6499, imageUrl: '/assets/seller-saree.png', material: 'gold' },
-  { id: 'sp-chiffon', name: 'Pastel Chiffon Saree', category: 'Saree', price: 1899, imageUrl: '/assets/sellers/saree.jpg', material: 'pearl' },
-  { id: 'sp-organza', name: 'Organza Floral Saree', category: 'Saree', price: 2799, imageUrl: '/assets/seller-saree.png', material: 'amethyst' },
-  // Kurtis
-  { id: 'sp-anarkali', name: 'Anarkali Embroidered Kurti', category: 'Kurti', price: 1299, imageUrl: '/assets/sellers/kurti.jpg', material: 'emerald' },
-  { id: 'sp-chikankari', name: 'Chikankari Cotton Kurti', category: 'Kurti', price: 999, imageUrl: '/assets/seller-kurti.png', material: 'pearl' },
-  { id: 'sp-blockprint', name: 'Block Print A-line Kurti', category: 'Kurti', price: 799, imageUrl: '/assets/sellers/kurti.jpg', material: 'sapphire' },
-  { id: 'sp-festivekurti', name: 'Festive Silk Kurti Set', category: 'Kurti', price: 1999, imageUrl: '/assets/seller-kurti.png', material: 'gold' },
-  // Jewellery
-  { id: 'sp-ranihaar', name: 'Kundan Ruby Pearl Rani Haar', category: 'Jewellery', price: 5999, imageUrl: '/assets/products/rani-haar.jpg', material: 'gold' },
-  { id: 'sp-signet', name: 'Sterling Silver Signet Ring', category: 'Jewellery', price: 2499, imageUrl: '/assets/products/ring.jpg', material: 'darksilver' },
-  { id: 'sp-moonstone', name: 'Moonstone Halo Pendant', category: 'Jewellery', price: 3299, imageUrl: '/assets/products/pendant.jpg', material: 'pearl' },
-  { id: 'sp-amethyst', name: 'Amethyst Drop Earrings', category: 'Jewellery', price: 1799, imageUrl: '/assets/products/earrings.jpg', material: 'amethyst' },
-  { id: 'sp-cuff', name: 'Oxidised Silver Cuff', category: 'Jewellery', price: 2199, imageUrl: '/assets/products/cuff.jpg', material: 'silver' },
-  { id: 'sp-topaz', name: 'Blue Topaz Cocktail Ring', category: 'Jewellery', price: 3999, imageUrl: '/assets/products/cocktail.jpg', material: 'sapphire' },
-  { id: 'sp-garnet', name: 'Garnet Charm Necklace', category: 'Jewellery', price: 2799, imageUrl: '/assets/products/necklace.jpg', material: 'ruby' },
-  // Accessories
-  { id: 'sp-potli', name: 'Embroidered Potli Bag', category: 'Accessories', price: 699, imageUrl: '/assets/sellers/accessories.jpg', material: 'gold' },
-  { id: 'sp-juttis', name: 'Handcrafted Juttis', category: 'Accessories', price: 1199, imageUrl: '/assets/shop-accessories.png', material: 'ruby' },
-  { id: 'sp-hairset', name: 'Kundan Hair Accessory Set', category: 'Accessories', price: 499, imageUrl: '/assets/sellers/accessories.jpg', material: 'gold' },
-  { id: 'sp-clutch', name: 'Silk Embroidered Clutch', category: 'Accessories', price: 899, imageUrl: '/assets/shop-accessories.png', material: 'amethyst' },
+  { id: 'sp-bag', name: 'Lavender Textured Handbag', category: 'Bags', price: 1999, imageUrl: '/assets/shop/bags.jpg', material: 'amethyst' },
+  { id: 'sp-earrings', name: 'Pearl Bow Stud Earrings', category: 'Jewellery', price: 1999, imageUrl: '/assets/shop/jewellery.jpg', material: 'gold' },
+  { id: 'sp-saree', name: 'Blush Organza Saree', category: 'Saree', price: 1999, imageUrl: '/assets/shop/saree.jpg', material: 'pearl' },
+  { id: 'sp-watch', name: 'Fastrack Minimal Steel Watch', category: 'Watch', price: 1999, imageUrl: '/assets/shop/watch.jpg', material: 'silver' },
+  { id: 'sp-kurti', name: 'Sky Blue Embroidered Kurti Set', category: 'Kurti', price: 1999, imageUrl: '/assets/shop/kurti.jpg', material: 'sapphire' },
 ];
 
 /* ---------------- chat bots ---------------- */

@@ -4,7 +4,7 @@ import { ProductImage } from '../components/ProductImage';
 import { SHOP_PRODUCTS, type ShopProduct } from '../data/seed';
 import { rupees } from '../lib/format';
 
-const FILTERS = ['All', 'Saree', 'Kurti', 'Jewellery', 'Accessories'] as const;
+const FILTERS = ['All', 'Jewellery', 'Saree', 'Kurti', 'Watch', 'Bags'] as const;
 type Filter = (typeof FILTERS)[number];
 
 function shuffle<T>(arr: T[]): T[] {
