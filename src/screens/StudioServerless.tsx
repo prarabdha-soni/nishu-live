@@ -1,18 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../components/Icon';
-import { FLAGSHIP_SELLER_ID, getLotsForSeller, getSeller } from '../data/seed';
-import { clock as clockFmt, money } from '../lib/format';
+import { SELLERS, getLotsForSeller, getSeller } from '../data/seed';
+import { clock as clockFmt, money, rupees } from '../lib/format';
 import { useHostRoom, type HostPace } from '../live/useHostRoom';
 
 const PACE_OPTIONS: HostPace[] = ['Off', 'Calm', 'Lively', 'Frenzy'];
 
 /**
  * Serverless seller studio (Vercel + Supabase mode): this tab IS the auction
- * server. Keep it open while you stream — bids from every watcher are
- * validated here and dummy orders land in the list below.
+ * server. Pick a section, go live, and bids from every watcher are validated
+ * here; dummy orders land in the list below. Whichever section you go live in
+ * is the one that appears on Home.
  */
 export function StudioServerless() {
-  const seller = getSeller(FLAGSHIP_SELLER_ID);
+  const [sellerId, setSellerId] = useState(SELLERS[0].id);
+  const seller = getSeller(sellerId);
   const lots = getLotsForSeller(seller.id);
   const [pace, setPace] = useState<HostPace>('Off');
   const host = useHostRoom(seller, lots, pace, true);
@@ -58,6 +60,26 @@ export function StudioServerless() {
         <span className={`conn-pill ${host.channelReady ? 'on' : ''}`}>
           {host.channelReady ? 'supabase channel connected' : 'connecting to supabase…'}
         </span>
+      </p>
+
+      <h3 className="sub-title" style={{ marginTop: 4 }}>
+        Go live as
+      </h3>
+      <div className="chip-row studio-sections">
+        {SELLERS.map((s) => (
+          <button
+            key={s.id}
+            className={`select-chip ${sellerId === s.id ? 'active' : ''}`}
+            disabled={host.live}
+            onClick={() => setSellerId(s.id)}
+          >
+            {s.category}
+          </button>
+        ))}
+      </div>
+      <p className="screen-sub" style={{ margin: '8px 0 14px' }}>
+        @{seller.handle} · pinned: <strong>{seller.pinnedName}</strong> · {rupees(seller.pinnedPrice)}
+        {host.live && ' · switch sections after ending the stream'}
       </p>
 
       <div className="studio-preview">

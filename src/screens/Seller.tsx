@@ -6,7 +6,7 @@ import { compact, money } from '../lib/format';
 import { useAppStore } from '../store/store';
 
 export function Seller() {
-  const { id = 'nishusilver' } = useParams();
+  const { id = 'jewel_daily' } = useParams();
   const navigate = useNavigate();
   const seller = getSeller(id);
   const isFollowing = useAppStore((s) => s.follows.includes(seller.id));

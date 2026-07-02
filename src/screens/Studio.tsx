@@ -32,7 +32,7 @@ export function Studio() {
 }
 
 function StudioSocket() {
-  const roomId = 'nishusilver';
+  const roomId = 'jewel_daily';
   const seller = getSeller(roomId);
 
   const [connected, setConnected] = useState(false);

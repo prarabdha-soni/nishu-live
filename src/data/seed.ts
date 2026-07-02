@@ -31,6 +31,8 @@ export interface Listing {
   imageUrl?: string;
 }
 
+export type ProductType = 'jewellery' | 'saree' | 'kurti' | 'watch' | 'bags';
+
 export interface Seller {
   id: string;
   handle: string;
@@ -41,6 +43,7 @@ export interface Seller {
   sales: number;
   bio: string;
   category: string;
+  productType: ProductType;
   liveViewers?: number;
   avatarUrl: string;
   coverUrl: string;
@@ -49,6 +52,11 @@ export interface Seller {
   cardImageUrl: string;
   cardBg: string;
   showTitle: string;
+  /** Home live-thumbnail shown while this seller is broadcasting. */
+  thumbnailUrl: string;
+  /** The pinned/featured product on the live screen. */
+  pinnedName: string;
+  pinnedPrice: number; // ₹
 }
 
 export interface ChatMessage {
@@ -244,6 +252,20 @@ const KURTI_LOTS: Lot[] = [
   },
 ];
 
+const WATCH_LOTS: Lot[] = [
+  { id: 'lot-fossil', name: 'Fossil Grant Chronograph Watch', material: 'sapphire', start: 15, value: 240, metal: 'Stainless steel', stone: 'Blue dial', size: '44 mm' },
+  { id: 'lot-titan', name: 'Titan Neo Analog Watch', material: 'darksilver', start: 10, value: 150, metal: 'Stainless steel', stone: 'White dial', size: '40 mm' },
+  { id: 'lot-casio', name: 'Casio Edifice Steel Watch', material: 'silver', start: 20, value: 260, metal: 'Stainless steel', stone: 'Black dial', size: '43 mm' },
+  { id: 'lot-dw', name: 'Daniel Wellington Classic', material: 'gold', start: 12, value: 200, metal: 'Rose gold', stone: 'Cream dial', size: '40 mm' },
+];
+
+const BAGS_LOTS: Lot[] = [
+  { id: 'lot-mk-tote', name: 'Michael Kors Jet Set Tote Bag', material: 'pearl', start: 20, value: 260, metal: 'Signature PVC', stone: 'Gold hardware', size: 'Medium' },
+  { id: 'lot-coach-sling', name: 'Coach Quilted Sling Bag', material: 'ruby', start: 15, value: 220, metal: 'Leather', stone: 'Chain strap', size: 'Small' },
+  { id: 'lot-crossbody', name: 'Leather Crossbody Bag', material: 'darksilver', start: 10, value: 140, metal: 'Genuine leather', stone: 'Silver hardware', size: 'Compact' },
+  { id: 'lot-structured', name: 'Structured Handbag', material: 'amethyst', start: 12, value: 180, metal: 'Vegan leather', stone: 'Top handle', size: 'Medium' },
+];
+
 /* ---------------- listings (buy-now, mirror the lots) ---------------- */
 
 export const LISTINGS: Listing[] = [
@@ -257,56 +279,44 @@ export const LISTINGS: Listing[] = [
 
 /* ---------------- sellers ---------------- */
 
+// One seller per product type. Each maps to a Studio "go live" section and a
+// Home live-thumbnail (public/assets/thumbnails/<productType>.jpg).
 export const SELLERS: Seller[] = [
   {
-    id: 'nishusilver',
-    handle: 'nishusilver',
-    name: 'Nishu Silver Jewellery',
+    id: 'jewel_daily',
+    handle: 'jewel_daily',
+    name: 'Jewel Daily',
     verified: true,
     rating: 4.9,
     followers: 12400,
     sales: 8200,
-    bio: 'Handcrafted 925 sterling silver & natural gemstones. Live auctions every evening — every lot starts low, every piece hallmarked.',
+    bio: 'Traditional & temple jewellery, live every evening. Every lot starts low.',
     category: 'Jewellery',
-    liveViewers: 1200,
-    avatarUrl: '/assets/avatars/nishu.jpg',
-    coverUrl: '/assets/posters/jewellery.jpg',
-    videoUrl: '/videos/jewellery.mp4',
-    posterUrl: '/assets/posters/jewellery.jpg',
-    cardImageUrl: '/assets/sellers/jewellery.jpg',
-    cardBg: 'var(--pastel-cream)',
-    showTitle: 'Silver Auction Night',
-  },
-  {
-    id: 'jewelrysparkle',
-    handle: 'jewelrysparkle',
-    name: 'Jewelry Sparkle',
-    verified: true,
-    rating: 4.8,
-    followers: 8600,
-    sales: 5100,
-    bio: 'Gemstones that catch the light. Nightly silver & stone drops, all hallmarked.',
-    category: 'Jewellery',
-    liveViewers: 842,
+    productType: 'jewellery',
+    liveViewers: 184,
     avatarUrl: '/assets/sellers/jewellery.jpg',
     coverUrl: '/assets/posters/jewellery.jpg',
     videoUrl: '/videos/jewellery.mp4',
     posterUrl: '/assets/posters/jewellery.jpg',
     cardImageUrl: '/assets/sellers/jewellery.jpg',
     cardBg: 'var(--pastel-cream)',
-    showTitle: 'Gemstone Sparkle Live',
+    showTitle: 'Jewellery Auction',
+    thumbnailUrl: '/assets/thumbnails/jewellery.jpg',
+    pinnedName: 'Premium Traditional Gold Necklace Set',
+    pinnedPrice: 2499,
   },
   {
-    id: 'sareestyle',
-    handle: 'sareestyle',
-    name: 'Saree Style Studio',
+    id: 'shree_sarees',
+    handle: 'shree_sarees',
+    name: 'Shree Sarees',
     verified: true,
-    rating: 4.7,
+    rating: 4.9,
     followers: 15200,
     sales: 9800,
     bio: 'Handloom silks to breezy chiffons — draped live so you see the real fall.',
     category: 'Sarees',
-    liveViewers: 1500,
+    productType: 'saree',
+    liveViewers: 256,
     avatarUrl: '/assets/sellers/saree.jpg',
     coverUrl: '/assets/posters/saree.jpg',
     videoUrl: '/videos/saree.mp4',
@@ -314,18 +324,22 @@ export const SELLERS: Seller[] = [
     cardImageUrl: '/assets/sellers/saree.jpg',
     cardBg: 'var(--pastel-lavender)',
     showTitle: 'Silk Saree Showcase',
+    thumbnailUrl: '/assets/thumbnails/saree.jpg',
+    pinnedName: 'Banarasi Silk Saree',
+    pinnedPrice: 1299,
   },
   {
-    id: 'kurticollection',
-    handle: 'kurticollection',
-    name: 'Kurti Collection Co.',
-    verified: false,
-    rating: 4.6,
+    id: 'kurti_fashion_station',
+    handle: 'kurti_fashion_station',
+    name: 'Kurti Fashion Station',
+    verified: true,
+    rating: 4.9,
     followers: 6900,
     sales: 4200,
     bio: 'Everyday cottons and festive sets, tried on live before you bid.',
     category: 'Kurtis',
-    liveViewers: 620,
+    productType: 'kurti',
+    liveViewers: 192,
     avatarUrl: '/assets/sellers/kurti.jpg',
     coverUrl: '/assets/posters/kurti.jpg',
     videoUrl: '/videos/kurti.mp4',
@@ -333,22 +347,81 @@ export const SELLERS: Seller[] = [
     cardImageUrl: '/assets/sellers/kurti.jpg',
     cardBg: 'var(--pastel-peach)',
     showTitle: 'Kurti Try-On Live',
+    thumbnailUrl: '/assets/thumbnails/kurti.jpg',
+    pinnedName: 'Lavender Embroidered Cotton Kurti',
+    pinnedPrice: 899,
+  },
+  {
+    id: 'watch_warehouse',
+    handle: 'watch_warehouse',
+    name: 'Watch Warehouse',
+    verified: true,
+    rating: 4.9,
+    followers: 9300,
+    sales: 6100,
+    bio: 'Branded watches at live-auction prices. Authenticity guaranteed.',
+    category: 'Watches',
+    productType: 'watch',
+    liveViewers: 312,
+    avatarUrl: '/assets/sellers/accessories.jpg',
+    coverUrl: '/assets/posters/jewellery.jpg',
+    videoUrl: '',
+    posterUrl: '',
+    cardImageUrl: '/assets/sellers/accessories.jpg',
+    cardBg: 'var(--pastel-mint)',
+    showTitle: 'Watch Auction',
+    thumbnailUrl: '/assets/thumbnails/watch.jpg',
+    pinnedName: 'Fossil Grant Chronograph Watch',
+    pinnedPrice: 2499,
+  },
+  {
+    id: 'bags_by_riya',
+    handle: 'bags_by_riya',
+    name: 'Bags by Riya',
+    verified: true,
+    rating: 4.9,
+    followers: 11200,
+    sales: 7400,
+    bio: 'Designer bags & purses, live daily. Good bags, good mood.',
+    category: 'Bags & Purses',
+    productType: 'bags',
+    liveViewers: 278,
+    avatarUrl: '/assets/sellers/lehenga.jpg',
+    coverUrl: '/assets/posters/saree.jpg',
+    videoUrl: '',
+    posterUrl: '',
+    cardImageUrl: '/assets/sellers/lehenga.jpg',
+    cardBg: 'var(--pastel-rose)',
+    showTitle: 'Bags & Purses Live',
+    thumbnailUrl: '/assets/thumbnails/bags.jpg',
+    pinnedName: 'Michael Kors Jet Set Tote Bag',
+    pinnedPrice: 2599,
   },
 ];
 
-export const HOME_SELLER_IDS = ['jewelrysparkle', 'sareestyle', 'kurticollection'];
+// All five seller ids, in the order they appear as Studio "go live" sections.
+export const SELLER_IDS = SELLERS.map((s) => s.id);
 
-export const FLAGSHIP_SELLER_ID = 'nishusilver';
+// Default room the Studio opens on (jewellery); also used by Activity.
+export const FLAGSHIP_SELLER_ID = 'jewel_daily';
 
 export function getSeller(id: string): Seller {
   return SELLERS.find((s) => s.id === id) ?? SELLERS[0];
 }
 
 export function getLotsForSeller(sellerId: string): Lot[] {
-  const seller = getSeller(sellerId);
-  if (seller.category === 'Sarees') return SAREE_LOTS;
-  if (seller.category === 'Kurtis') return KURTI_LOTS;
-  return JEWELLERY_LOTS;
+  switch (getSeller(sellerId).productType) {
+    case 'saree':
+      return SAREE_LOTS;
+    case 'kurti':
+      return KURTI_LOTS;
+    case 'watch':
+      return WATCH_LOTS;
+    case 'bags':
+      return BAGS_LOTS;
+    default:
+      return JEWELLERY_LOTS;
+  }
 }
 
 /* ---------------- shop categories ---------------- */

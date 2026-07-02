@@ -8,7 +8,7 @@ import { useLiveRoom } from '../live/useLiveRoom';
 import { useAppStore } from '../store/store';
 
 export function Live() {
-  const { sellerId = 'nishusilver' } = useParams();
+  const { sellerId = 'jewel_daily' } = useParams();
   const seller = getSeller(sellerId);
   const lots = getLotsForSeller(seller.id);
   const room = useLiveRoom(seller, lots);
@@ -306,8 +306,8 @@ function LiveVideo({
       <video
         ref={ref}
         className="live-video"
-        src={stream ? undefined : fallbackSrc}
-        poster={poster}
+        src={stream ? undefined : fallbackSrc || undefined}
+        poster={poster || undefined}
         autoPlay
         muted={!stream}
         loop={!stream}

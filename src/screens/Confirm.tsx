@@ -34,7 +34,7 @@ export function Confirm() {
 
       <div className="confirm-actions">
         <Link
-          to={order ? `/live/${order.item.sellerId}` : '/live/nishusilver'}
+          to={order ? `/live/${order.item.sellerId}` : '/live/jewel_daily'}
           className="btn-primary wide center-text"
         >
           Back to auction

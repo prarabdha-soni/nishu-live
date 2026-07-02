@@ -1,22 +1,25 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from '../components/Icon';
-import { FLAGSHIP_SELLER_ID, HOME_SELLER_IDS, getSeller, type Seller } from '../data/seed';
-import { compact } from '../lib/format';
-import { useLiveStatus } from '../live/useLiveStatus';
+import { SELLER_IDS, getSeller, type Seller } from '../data/seed';
+import { compact, rupees } from '../lib/format';
+import { useLiveSellers } from '../live/useLiveSellers';
 import { useAppStore } from '../store/store';
 
 export function Home() {
   const [pill, setPill] = useState<'foryou' | 'followed'>('foryou');
   const [query, setQuery] = useState('');
   const follows = useAppStore((s) => s.follows);
+  const liveMap = useLiveSellers(SELLER_IDS);
 
-  const sellers = HOME_SELLER_IDS.map(getSeller).filter((s) => {
-    if (pill === 'followed' && !follows.includes(s.id)) return false;
-    if (!query) return true;
-    const q = query.toLowerCase();
-    return s.handle.includes(q) || s.name.toLowerCase().includes(q) || s.category.toLowerCase().includes(q);
-  });
+  const liveSellers = SELLER_IDS.map(getSeller)
+    .filter((s) => liveMap[s.id]?.live)
+    .filter((s) => {
+      if (pill === 'followed' && !follows.includes(s.id)) return false;
+      if (!query) return true;
+      const q = query.toLowerCase();
+      return s.handle.includes(q) || s.name.toLowerCase().includes(q) || s.category.toLowerCase().includes(q);
+    });
 
   return (
     <div className="screen home">
@@ -65,100 +68,70 @@ export function Home() {
         </button>
       </div>
 
-      <MyShopCard />
+      <h2 className="section-title">Live now</h2>
 
-      <h2 className="section-title">Top Sellers</h2>
-
-      <div className="seller-list">
-        {sellers.map((s) => (
-          <SellerCard key={s.id} seller={s} />
-        ))}
-        {sellers.length === 0 && (
-          <p className="empty-note">
-            {pill === 'followed'
-              ? 'No followed hosts here yet — follow a seller from their live room.'
-              : 'No sellers match that search.'}
-          </p>
-        )}
-      </div>
+      {liveSellers.length === 0 ? (
+        <EmptyLive following={pill === 'followed'} />
+      ) : (
+        <div className="live-grid">
+          {liveSellers.map((s) => (
+            <LiveThumb key={s.id} seller={s} viewers={liveMap[s.id]?.viewers ?? 0} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-/** The admin/owner card: shows your own shop, flips LIVE when you go live from /studio. */
-function MyShopCard() {
-  const seller = getSeller(FLAGSHIP_SELLER_ID);
-  const { status, viewers } = useLiveStatus(seller.id);
-
-  if (status === 'offline') {
-    return (
-      <div className="myshop-card offline">
-        <img src={seller.avatarUrl} alt="" className="myshop-avatar" />
-        <div className="myshop-info">
-          <div className="myshop-name">
-            {seller.name}
-            <span className="you-chip">Your shop</span>
-          </div>
-          <div className="myshop-sub">Offline — start streaming from the studio</div>
-        </div>
-        <Link to="/studio" className="golive-btn">
-          <Icon name="videocam" filled size={16} />
-          Go live
-        </Link>
-      </div>
-    );
-  }
-
-  const isLive = status === 'live';
+function LiveThumb({ seller, viewers }: { seller: Seller; viewers: number }) {
   return (
-    <Link to={`/live/${seller.id}`} className={`myshop-card ${isLive ? 'live' : 'ready'}`}>
-      <span className={isLive ? 'live-ring' : 'ready-ring'}>
-        <img src={seller.avatarUrl} alt="" />
-      </span>
-      <div className="myshop-info">
-        <div className="myshop-name">
-          {seller.name}
-          <span className="you-chip">Your shop</span>
-        </div>
-        <div className="myshop-sub">
-          {isLive ? `${seller.showTitle} · streaming now` : 'Studio connected · starting soon…'}
-        </div>
+    <Link to={`/live/${seller.id}`} className="live-thumb">
+      <div className="live-thumb-img">
+        <img
+          src={seller.thumbnailUrl}
+          alt={`${seller.handle} live`}
+          loading="lazy"
+          onError={(e) => {
+            const t = e.currentTarget;
+            if (!t.dataset.fallback) {
+              t.dataset.fallback = '1';
+              t.src = seller.cardImageUrl;
+            }
+          }}
+        />
       </div>
-      {isLive ? (
+      <div className="live-thumb-cap">
         <span className="live-badge">
           <span className="live-dot" aria-hidden="true" />
           LIVE{viewers > 0 ? ` · ${compact(viewers)}` : ''}
         </span>
-      ) : (
-        <span className="soon-badge">Soon</span>
-      )}
+        <div className="live-thumb-handle">
+          @{seller.handle}
+          {seller.verified && <Icon name="verified" filled size={14} className="verified" />}
+        </div>
+        <div className="live-thumb-product">
+          {seller.pinnedName} · <strong>{rupees(seller.pinnedPrice)}</strong>
+        </div>
+      </div>
     </Link>
   );
 }
 
-function SellerCard({ seller }: { seller: Seller }) {
+function EmptyLive({ following }: { following: boolean }) {
   return (
-    <Link to={`/live/${seller.id}`} className="seller-card" style={{ background: seller.cardBg }}>
-      <div className="seller-card-info">
-        <div className="seller-card-handle">
-          @{seller.handle}
-          {seller.verified && <Icon name="verified" filled size={16} className="verified" />}
-        </div>
-        <div className="seller-card-cat">
-          {seller.category}
-          <span className="seller-card-rating">
-            <Icon name="star" filled size={12} className="star" />
-            {seller.rating}
-          </span>
-        </div>
-        <span className="live-badge">
-          <span className="live-dot" aria-hidden="true" />
-          Live · {compact(seller.liveViewers ?? 0)}
-        </span>
+    <div className="live-empty">
+      <span className="live-empty-icon">
+        <Icon name="sensors_off" size={32} />
+      </span>
+      <div className="live-empty-title">No live auctions right now</div>
+      <div className="live-empty-sub">
+        {following
+          ? 'None of your followed hosts are live yet.'
+          : 'Nothing streaming at the moment — check back soon.'}
       </div>
-      <div className="seller-card-img">
-        <img src={seller.cardImageUrl} alt={seller.name} loading="lazy" />
-      </div>
-    </Link>
+      <Link to="/studio" className="btn-secondary live-empty-cta">
+        <Icon name="videocam" size={18} /> Go live in the studio
+      </Link>
+    </div>
   );
 }
