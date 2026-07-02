@@ -129,9 +129,6 @@ function EmptyLive({ following }: { following: boolean }) {
           ? 'None of your followed hosts are live yet.'
           : 'Nothing streaming at the moment — check back soon.'}
       </div>
-      <Link to="/studio" className="btn-secondary live-empty-cta">
-        <Icon name="videocam" size={18} /> Go live in the studio
-      </Link>
     </div>
   );
 }
