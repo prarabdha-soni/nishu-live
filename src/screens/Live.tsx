@@ -54,8 +54,8 @@ export function Live() {
         <div className="waiting-banner">
           <span className="waiting-pulse" aria-hidden="true" />
           <div className="waiting-text">
-            <div className="waiting-title">Auction hasn’t started yet</div>
-            <div className="waiting-sub">Waiting for @{seller.handle} to go live…</div>
+            <div className="waiting-title">Awaiting bids</div>
+            <div className="waiting-sub">Waiting for @{seller.handle} to start the auction…</div>
           </div>
         </div>
       )}
@@ -220,7 +220,7 @@ export function Live() {
           onClick={() => room.placeBid()}
         >
           {waiting
-            ? 'Waiting for the host to start…'
+            ? 'Awaiting bids…'
             : state.youWin
               ? `You're winning · re-bid ${money(nextBid)}`
               : `Place bid · ${money(nextBid)}`}
@@ -294,9 +294,8 @@ function LiveVideo({ stream, poster }: { stream: MediaStream | null; poster: str
     if (!el) return;
     el.muted = false;
     el.volume = 1;
-    el.play()
-      .then(() => setShowUnmute(false))
-      .catch(() => {});
+    setShowUnmute(false);
+    el.play().catch(() => {});
   };
 
   if (!stream) {
@@ -308,9 +307,12 @@ function LiveVideo({ stream, poster }: { stream: MediaStream | null; poster: str
     );
   }
 
+  // NOTE: no `muted` attribute in JSX on purpose — React would reset the muted
+  // property on every re-render and silently re-mute after "Tap for sound".
+  // Muting is controlled imperatively via the ref (muted for autoplay, then off).
   return (
     <>
-      <video ref={ref} className="live-video" autoPlay muted playsInline />
+      <video ref={ref} className="live-video" autoPlay playsInline />
       {showUnmute && (
         <button className="unmute-chip" onClick={enableSound}>
           <Icon name="volume_up" filled size={16} /> Tap for sound

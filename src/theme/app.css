@@ -2247,6 +2247,10 @@
   margin: 14px 0 6px;
 }
 
+.start-bid-btn {
+  margin-top: 8px;
+}
+
 .studio-controls .btn-primary,
 .studio-controls .btn-secondary {
   flex: 1;

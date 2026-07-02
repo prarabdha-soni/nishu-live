@@ -21,7 +21,8 @@ interface HostSnapshot {
   validAmounts: [number, number, number];
   chat: ChatMessage[];
   viewers: number;
-  live: boolean;
+  live: boolean; // camera broadcasting
+  bidding: boolean; // auction clock running
   hostAt: number;
 }
 
@@ -53,8 +54,8 @@ export function useSupabaseRoom(seller: Seller, lots: Lot[], enabled: boolean): 
   const wonRef = useRef(won);
   wonRef.current = won;
 
-  // waiting = the seller hasn't started the auction yet (no live host on the channel)
-  const isLive = hostSeen && !!snap?.live;
+  // waiting = the seller hasn't started bidding yet (they may be live on camera already)
+  const isBidding = hostSeen && !!snap?.bidding;
 
   useEffect(() => {
     if (!enabled) return;
@@ -172,7 +173,7 @@ export function useSupabaseRoom(seller: Seller, lots: Lot[], enabled: boolean): 
   /* ---- compose ---- */
 
   return useMemo<LiveRoom>(() => {
-    const waiting = !won && !isLive;
+    const waiting = !won && !isBidding;
     const lotIndex = won
       ? Math.max(0, lots.findIndex((l) => l.id === won.lot.id))
       : snap?.lotIndex ?? 0;
@@ -213,5 +214,5 @@ export function useSupabaseRoom(seller: Seller, lots: Lot[], enabled: boolean): 
       broadcasting: !!snap?.live,
       waiting,
     };
-  }, [isLive, hostSeen, graceOver, snap, won, lots, uid, viewers, remoteStream, placeBid, sendChat, continueToNext]);
+  }, [isBidding, hostSeen, graceOver, snap, won, lots, uid, viewers, remoteStream, placeBid, sendChat, continueToNext]);
 }

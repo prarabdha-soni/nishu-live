@@ -22,9 +22,12 @@ export interface HostRoom {
   channelReady: boolean;
   viewers: number;
   live: boolean;
+  bidding: boolean;
   ordersReceived: OrderAnnounce[];
   goLive: (stream: MediaStream) => void;
   endLive: () => void;
+  startBidding: () => void;
+  pauseBidding: () => void;
   nextLot: () => void;
 }
 
@@ -40,17 +43,20 @@ export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled
   const [channelReady, setChannelReady] = useState(false);
   const [viewers, setViewers] = useState(0);
   const [live, setLive] = useState(false);
+  const [bidding, setBidding] = useState(false);
   const [ordersReceived, setOrdersReceived] = useState<OrderAnnounce[]>([]);
 
-  // The auction clock only runs once the seller actually goes live — no bidding
-  // starts on its own just because the studio tab is open.
-  const room = useAuctionRoom(seller, lots, botsEnabled ? pace : 'Lively', enabled && live, botsEnabled);
+  // "Go live" only turns the camera on. The auction clock stays paused until the
+  // seller taps "Start bidding" — viewers see an "awaiting bids" message until then.
+  const room = useAuctionRoom(seller, lots, botsEnabled ? pace : 'Lively', enabled && bidding, botsEnabled);
 
   const uid = getUid();
   const channelRef = useRef<RealtimeChannel | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const liveRef = useRef(false);
   liveRef.current = live;
+  const biddingRef = useRef(false);
+  biddingRef.current = bidding;
   const peersRef = useRef<Map<string, RTCPeerConnection>>(new Map());
   const noncesRef = useRef<Set<string>>(new Set());
   const roomRef = useRef(room);
@@ -81,6 +87,7 @@ export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled
         chat: s.chat.slice(-30),
         viewers: viewersRef.current,
         live: liveRef.current,
+        bidding: biddingRef.current,
         hostAt: Date.now(),
       },
     });
@@ -186,7 +193,7 @@ export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled
   useEffect(() => {
     if (!enabled || !channelReady) return;
     broadcast();
-  }, [enabled, channelReady, room.state, room.nextBid, live, broadcast]);
+  }, [enabled, channelReady, room.state, room.nextBid, live, bidding, broadcast]);
 
   // heartbeat: keep idle/late viewers converged on the current state + live flag
   useEffect(() => {
@@ -204,19 +211,26 @@ export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled
 
   const endLive = useCallback(() => {
     setLive(false);
+    setBidding(false); // ending the stream stops the auction too
     streamRef.current = null;
     for (const pc of peersRef.current.values()) pc.close();
     peersRef.current.clear();
   }, []);
+
+  const startBidding = useCallback(() => setBidding(true), []);
+  const pauseBidding = useCallback(() => setBidding(false), []);
 
   return {
     room,
     channelReady,
     viewers,
     live,
+    bidding,
     ordersReceived,
     goLive,
     endLive,
+    startBidding,
+    pauseBidding,
     nextLot: room.continueToNext,
   };
 }

@@ -70,7 +70,7 @@ export function StudioServerless() {
           <button
             key={s.id}
             className={`select-chip ${sellerId === s.id ? 'active' : ''}`}
-            disabled={host.live}
+            disabled={host.live || host.bidding}
             onClick={() => setSellerId(s.id)}
           >
             {s.category}
@@ -115,6 +115,18 @@ export function StudioServerless() {
           <Icon name="skip_next" size={20} /> Next lot
         </button>
       </div>
+
+      {/* Bidding is a separate step from going live — viewers see "awaiting bids"
+          until this is pressed. */}
+      {!host.bidding ? (
+        <button className="btn-primary wide start-bid-btn" onClick={host.startBidding}>
+          <Icon name="gavel" size={20} /> Start bidding
+        </button>
+      ) : (
+        <button className="btn-secondary wide start-bid-btn" onClick={host.pauseBidding}>
+          <Icon name="pause_circle" size={20} /> Pause bidding
+        </button>
+      )}
       {error && <p className="empty-note">{error}</p>}
 
       <div className="studio-state">
@@ -134,7 +146,7 @@ export function StudioServerless() {
         <div className="studio-state-row">
           <span>Clock</span>
           <strong>
-            {!host.live ? 'not started' : state.status === 'open' ? clockFmt(state.timeLeft) : 'ended'}
+            {!host.bidding ? 'paused' : state.status === 'open' ? clockFmt(state.timeLeft) : 'ended'}
           </strong>
         </div>
         <div className="studio-state-row">
@@ -142,9 +154,10 @@ export function StudioServerless() {
           <strong>{host.viewers}</strong>
         </div>
       </div>
-      {!host.live && (
+      {!host.bidding && (
         <p className="screen-sub" style={{ marginTop: 10 }}>
-          The auction is paused. Bidding starts for everyone the moment you tap <strong>Go live</strong>.
+          Bidding is paused — viewers see “awaiting bids”. Tap <strong>Start bidding</strong> to open the
+          auction{host.live ? '.' : ' (you can go live first).'}
         </p>
       )}
 
