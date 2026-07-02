@@ -47,7 +47,6 @@ export interface Seller {
   liveViewers?: number;
   avatarUrl: string;
   coverUrl: string;
-  videoUrl: string;
   posterUrl: string;
   cardImageUrl: string;
   cardBg: string;
@@ -296,7 +295,6 @@ export const SELLERS: Seller[] = [
     liveViewers: 184,
     avatarUrl: '/assets/sellers/jewellery.jpg',
     coverUrl: '/assets/posters/jewellery.jpg',
-    videoUrl: '/videos/jewellery.mp4',
     posterUrl: '/assets/posters/jewellery.jpg',
     cardImageUrl: '/assets/sellers/jewellery.jpg',
     cardBg: 'var(--pastel-cream)',
@@ -319,7 +317,6 @@ export const SELLERS: Seller[] = [
     liveViewers: 256,
     avatarUrl: '/assets/sellers/saree.jpg',
     coverUrl: '/assets/posters/saree.jpg',
-    videoUrl: '/videos/saree.mp4',
     posterUrl: '/assets/posters/saree.jpg',
     cardImageUrl: '/assets/sellers/saree.jpg',
     cardBg: 'var(--pastel-lavender)',
@@ -342,7 +339,6 @@ export const SELLERS: Seller[] = [
     liveViewers: 192,
     avatarUrl: '/assets/sellers/kurti.jpg',
     coverUrl: '/assets/posters/kurti.jpg',
-    videoUrl: '/videos/kurti.mp4',
     posterUrl: '/assets/posters/kurti.jpg',
     cardImageUrl: '/assets/sellers/kurti.jpg',
     cardBg: 'var(--pastel-peach)',
@@ -365,7 +361,6 @@ export const SELLERS: Seller[] = [
     liveViewers: 312,
     avatarUrl: '/assets/sellers/accessories.jpg',
     coverUrl: '/assets/posters/jewellery.jpg',
-    videoUrl: '',
     posterUrl: '',
     cardImageUrl: '/assets/sellers/accessories.jpg',
     cardBg: 'var(--pastel-mint)',
@@ -388,7 +383,6 @@ export const SELLERS: Seller[] = [
     liveViewers: 278,
     avatarUrl: '/assets/sellers/lehenga.jpg',
     coverUrl: '/assets/posters/saree.jpg',
-    videoUrl: '',
     posterUrl: '',
     cardImageUrl: '/assets/sellers/lehenga.jpg',
     cardBg: 'var(--pastel-rose)',

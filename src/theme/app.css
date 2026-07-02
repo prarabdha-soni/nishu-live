@@ -716,6 +716,10 @@
   object-fit: cover;
 }
 
+.live-video-blank {
+  background: #14100e;
+}
+
 .live-scrim {
   position: absolute;
   inset: 0;

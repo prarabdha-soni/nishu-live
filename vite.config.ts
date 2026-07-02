@@ -51,15 +51,6 @@ export default defineConfig({
               expiration: { maxEntries: 120, maxAgeSeconds: 60 * 60 * 24 * 30 },
             },
           },
-          {
-            urlPattern: /\/videos\/.*\.mp4$/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'live-posters',
-              rangeRequests: true,
-              expiration: { maxEntries: 6, maxAgeSeconds: 60 * 60 * 24 * 7 },
-            },
-          },
         ],
       },
     }),

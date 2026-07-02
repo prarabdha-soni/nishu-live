@@ -47,11 +47,7 @@ export function Live() {
 
   return (
     <div className="live-screen">
-      <LiveVideo
-        stream={room.remoteStream}
-        fallbackSrc={seller.videoUrl}
-        poster={seller.posterUrl}
-      />
+      <LiveVideo stream={room.remoteStream} poster={seller.posterUrl} />
       <div className="live-scrim" aria-hidden="true" />
 
       {waiting && (
@@ -271,19 +267,12 @@ export function Live() {
   );
 }
 
-/** Real seller camera + audio (WebRTC) when broadcasting; dummy seller video otherwise. */
-function LiveVideo({
-  stream,
-  fallbackSrc,
-  poster,
-}: {
-  stream: MediaStream | null;
-  fallbackSrc: string;
-  poster: string;
-}) {
+/** Real seller camera + audio over WebRTC. Before the stream arrives, shows a
+ * still poster (or dark canvas) — no fake/looping video. */
+function LiveVideo({ stream, poster }: { stream: MediaStream | null; poster: string }) {
   const ref = useRef<HTMLVideoElement>(null);
-  // The dummy fallback clip stays silent. A real seller stream carries audio,
-  // but browsers only autoplay muted — so we start muted and offer a tap-to-unmute.
+  // A real seller stream carries audio, but browsers only autoplay muted —
+  // so we start muted and offer a tap-to-unmute.
   const [showUnmute, setShowUnmute] = useState(false);
 
   useEffect(() => {
@@ -310,19 +299,19 @@ function LiveVideo({
       .catch(() => {});
   };
 
+  if (!stream) {
+    // no live camera yet → static poster over the dark canvas
+    return poster ? (
+      <img className="live-video" src={poster} alt="" />
+    ) : (
+      <div className="live-video live-video-blank" />
+    );
+  }
+
   return (
     <>
-      <video
-        ref={ref}
-        className="live-video"
-        src={stream ? undefined : fallbackSrc || undefined}
-        poster={poster || undefined}
-        autoPlay
-        muted={!stream}
-        loop={!stream}
-        playsInline
-      />
-      {stream && showUnmute && (
+      <video ref={ref} className="live-video" autoPlay muted playsInline />
+      {showUnmute && (
         <button className="unmute-chip" onClick={enableSound}>
           <Icon name="volume_up" filled size={16} /> Tap for sound
         </button>
