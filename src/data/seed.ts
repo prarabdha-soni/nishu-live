@@ -393,6 +393,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
   { id: 'sp-blockprint', name: 'Block Print A-line Kurti', category: 'Kurti', price: 799, imageUrl: '/assets/sellers/kurti.jpg', material: 'sapphire' },
   { id: 'sp-festivekurti', name: 'Festive Silk Kurti Set', category: 'Kurti', price: 1999, imageUrl: '/assets/seller-kurti.png', material: 'gold' },
   // Jewellery
+  { id: 'sp-ranihaar', name: 'Kundan Ruby Pearl Rani Haar', category: 'Jewellery', price: 5999, imageUrl: '/assets/products/rani-haar.jpg', material: 'gold' },
   { id: 'sp-signet', name: 'Sterling Silver Signet Ring', category: 'Jewellery', price: 2499, imageUrl: '/assets/products/ring.jpg', material: 'darksilver' },
   { id: 'sp-moonstone', name: 'Moonstone Halo Pendant', category: 'Jewellery', price: 3299, imageUrl: '/assets/products/pendant.jpg', material: 'pearl' },
   { id: 'sp-amethyst', name: 'Amethyst Drop Earrings', category: 'Jewellery', price: 1799, imageUrl: '/assets/products/earrings.jpg', material: 'amethyst' },
