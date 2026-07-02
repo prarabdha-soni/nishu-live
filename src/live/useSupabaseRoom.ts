@@ -39,6 +39,7 @@ export function useSupabaseRoom(seller: Seller, lots: Lot[], enabled: boolean): 
   const [graceOver, setGraceOver] = useState(false);
   const [won, setWon] = useState<{ lot: Lot; price: number } | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+  const [viewers, setViewers] = useState(0); // live count from channel presence (always accurate)
 
   const uid = getUid();
   const handle = getHandle();
@@ -105,6 +106,12 @@ export function useSupabaseRoom(seller: Seller, lots: Lot[], enabled: boolean): 
     channel.on('broadcast', { event: 'rtc.ice' }, ({ payload }) => {
       if (payload?.to !== uid) return;
       pcRef.current?.addIceCandidate(payload.candidate).catch(() => {});
+    });
+
+    // count everyone on this channel who's here as a viewer (includes us)
+    channel.on('presence', { event: 'sync' }, () => {
+      const entries = Object.values(channel.presenceState<{ role: string }>()).flat();
+      setViewers(entries.filter((e) => e.role === 'viewer').length);
     });
 
     channel.subscribe((status) => {
@@ -185,7 +192,7 @@ export function useSupabaseRoom(seller: Seller, lots: Lot[], enabled: boolean): 
       status: won ? 'won' : waiting ? 'open' : snap?.status === 'ended' ? 'sold' : 'open',
       soldPrice: won ? won.price : snap?.soldPrice ?? null,
       chat: snap?.chat ?? [],
-      viewers: snap?.viewers ?? 0,
+      viewers: Math.max(viewers, snap?.viewers ?? 0),
       bidKey: snap?.bidCount ?? 0,
     };
 
@@ -206,5 +213,5 @@ export function useSupabaseRoom(seller: Seller, lots: Lot[], enabled: boolean): 
       broadcasting: !!snap?.live,
       waiting,
     };
-  }, [isLive, hostSeen, graceOver, snap, won, lots, uid, remoteStream, placeBid, sendChat, continueToNext]);
+  }, [isLive, hostSeen, graceOver, snap, won, lots, uid, viewers, remoteStream, placeBid, sendChat, continueToNext]);
 }

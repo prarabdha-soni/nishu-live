@@ -836,6 +836,31 @@
   color: var(--accent);
 }
 
+.live-status-row {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0 12px;
+  align-self: flex-start;
+}
+
+.watchers-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(20, 16, 14, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 800;
+  border-radius: var(--r-pill);
+  padding: 7px 12px;
+  font-variant-numeric: tabular-nums;
+}
+
 .rules-trigger {
   position: relative;
   z-index: 5;

@@ -85,13 +85,22 @@ export function Live() {
           </button>
         </div>
         <div className="live-top-right">
-          <span className="viewer-count">
-            <Icon name="visibility" filled size={16} /> {compact(state.viewers)}
-          </span>
           <button className="glass-btn" aria-label="Close live" onClick={() => navigate('/')}>
             <Icon name="keyboard_arrow_down" size={24} />
           </button>
         </div>
+      </div>
+
+      <div className="live-status-row">
+        {room.broadcasting && (
+          <span className="live-badge">
+            <span className="live-dot" aria-hidden="true" /> Live
+          </span>
+        )}
+        <span className="watchers-pill" aria-live="polite">
+          <Icon name="visibility" filled size={15} />
+          {compact(state.viewers)} watching
+        </span>
       </div>
 
       <button className="rules-trigger" onClick={() => setRulesOpen((v) => !v)}>
