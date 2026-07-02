@@ -47,7 +47,7 @@ export function Live() {
 
   return (
     <div className="live-screen">
-      <LiveVideo stream={room.remoteStream} poster={seller.posterUrl} />
+      <LiveVideo stream={room.remoteStream} />
       <div className="live-scrim" aria-hidden="true" />
 
       {waiting && (
@@ -268,8 +268,8 @@ export function Live() {
 }
 
 /** Real seller camera + audio over WebRTC. Before the stream arrives, shows a
- * still poster (or dark canvas) — no fake/looping video. */
-function LiveVideo({ stream, poster }: { stream: MediaStream | null; poster: string }) {
+ * plain dark canvas — no placeholder image or fake video. */
+function LiveVideo({ stream }: { stream: MediaStream | null }) {
   const ref = useRef<HTMLVideoElement>(null);
   // A real seller stream carries audio, but browsers only autoplay muted —
   // so we start muted and offer a tap-to-unmute.
@@ -299,12 +299,8 @@ function LiveVideo({ stream, poster }: { stream: MediaStream | null; poster: str
   };
 
   if (!stream) {
-    // no live camera yet → static poster over the dark canvas
-    return poster ? (
-      <img className="live-video" src={poster} alt="" />
-    ) : (
-      <div className="live-video live-video-blank" />
-    );
+    // no live camera yet → plain dark canvas, no placeholder image/video
+    return <div className="live-video live-video-blank" />;
   }
 
   // NOTE: no `muted` attribute in JSX on purpose — React would reset the muted
