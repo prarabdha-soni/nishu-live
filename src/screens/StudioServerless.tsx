@@ -111,13 +111,20 @@ export function StudioServerless() {
         </div>
         <div className="studio-state-row">
           <span>Clock</span>
-          <strong>{state.status === 'open' ? clockFmt(state.timeLeft) : 'ended'}</strong>
+          <strong>
+            {!host.live ? 'not started' : state.status === 'open' ? clockFmt(state.timeLeft) : 'ended'}
+          </strong>
         </div>
         <div className="studio-state-row">
           <span>Watching</span>
           <strong>{host.viewers}</strong>
         </div>
       </div>
+      {!host.live && (
+        <p className="screen-sub" style={{ marginTop: 10 }}>
+          The auction is paused. Bidding starts for everyone the moment you tap <strong>Go live</strong>.
+        </p>
+      )}
 
       <h3 className="sub-title">Rival bots</h3>
       <div className="chip-row">

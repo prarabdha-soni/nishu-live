@@ -2,6 +2,10 @@ export function money(n: number): string {
   return '$' + n.toLocaleString('en-US');
 }
 
+export function rupees(n: number): string {
+  return '₹' + n.toLocaleString('en-IN');
+}
+
 export function clock(seconds: number): string {
   const s = Math.max(0, seconds);
   return `0:${String(s).padStart(2, '0')}`;

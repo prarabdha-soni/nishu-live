@@ -23,6 +23,8 @@ export function Live() {
 
   const { state, lot, nextBid, chips } = room;
   const ended = state.status !== 'open';
+  const waiting = room.waiting;
+  const bidsLocked = ended || waiting;
   const statusLine =
     state.status === 'open' && state.timeLeft <= 3
       ? 'Going twice…'
@@ -51,6 +53,16 @@ export function Live() {
         poster={seller.posterUrl}
       />
       <div className="live-scrim" aria-hidden="true" />
+
+      {waiting && (
+        <div className="waiting-banner">
+          <span className="waiting-pulse" aria-hidden="true" />
+          <div className="waiting-text">
+            <div className="waiting-title">Auction hasn’t started yet</div>
+            <div className="waiting-sub">Waiting for @{seller.handle} to go live…</div>
+          </div>
+        </div>
+      )}
 
       {/* top bar */}
       <div className="live-top">
@@ -85,10 +97,10 @@ export function Live() {
       <button className="rules-trigger" onClick={() => setRulesOpen((v) => !v)}>
         <Icon name="info" size={14} /> Auction rules
       </button>
-      {room.mode !== 'server' && (
+      {!waiting && room.mode !== 'server' && (
         <span className="live-mode-pill">{room.mode === 'sim' ? 'demo · offline sim' : 'connecting…'}</span>
       )}
-      {room.mode === 'server' && room.remoteStream && <span className="live-mode-pill">seller cam · live</span>}
+      {room.remoteStream && <span className="live-mode-pill">seller cam · live</span>}
       {rulesOpen && (
         <div className="rules-pop" role="dialog" aria-label="Auction rules">
           <h4>How bidding works</h4>
@@ -149,10 +161,17 @@ export function Live() {
               Lot {state.lotIndex + 1} of {state.lots.length} · {lot.metal}
             </div>
           </div>
-          <div className={`panel-timer ${state.timeLeft <= 3 ? 'red' : state.timeLeft <= 6 ? 'amber' : ''}`}>
-            <Icon name="timer" size={16} />
-            {clock(state.timeLeft)}
-          </div>
+          {waiting ? (
+            <div className="panel-timer soon">
+              <Icon name="hourglass_empty" size={16} />
+              Soon
+            </div>
+          ) : (
+            <div className={`panel-timer ${state.timeLeft <= 3 ? 'red' : state.timeLeft <= 6 ? 'amber' : ''}`}>
+              <Icon name="timer" size={16} />
+              {clock(state.timeLeft)}
+            </div>
+          )}
         </div>
 
         <div className="panel-bid-row" aria-live="polite">
@@ -163,7 +182,9 @@ export function Live() {
             </div>
           </div>
           <div className="panel-bidder">
-            {statusLine ? (
+            {waiting ? (
+              <span>waiting to start</span>
+            ) : statusLine ? (
               <span className={`going ${state.timeLeft <= 3 ? 'red' : 'amber'}`}>{statusLine}</span>
             ) : state.bidder ? (
               <span>
@@ -180,7 +201,7 @@ export function Live() {
             <button
               key={`${i}-${amt}`}
               className={`chip-bid ${i === 0 ? 'primary' : ''}`}
-              disabled={ended}
+              disabled={bidsLocked}
               onClick={() => room.placeBid(amt)}
             >
               {money(amt)}
@@ -190,10 +211,14 @@ export function Live() {
 
         <button
           className={`bid-main ${state.youWin ? 'winning' : ''}`}
-          disabled={ended}
+          disabled={bidsLocked}
           onClick={() => room.placeBid()}
         >
-          {state.youWin ? `You're winning · re-bid ${money(nextBid)}` : `Place bid · ${money(nextBid)}`}
+          {waiting
+            ? 'Waiting for the host to start…'
+            : state.youWin
+              ? `You're winning · re-bid ${money(nextBid)}`
+              : `Place bid · ${money(nextBid)}`}
         </button>
       </div>
 
@@ -237,7 +262,7 @@ export function Live() {
   );
 }
 
-/** Real seller camera (WebRTC) when broadcasting; dummy seller video otherwise. */
+/** Real seller camera + audio (WebRTC) when broadcasting; dummy seller video otherwise. */
 function LiveVideo({
   stream,
   fallbackSrc,
@@ -248,29 +273,52 @@ function LiveVideo({
   poster: string;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
+  // The dummy fallback clip stays silent. A real seller stream carries audio,
+  // but browsers only autoplay muted — so we start muted and offer a tap-to-unmute.
+  const [showUnmute, setShowUnmute] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     if (stream) {
       el.srcObject = stream;
+      el.muted = true; // guarantee autoplay
       el.play().catch(() => {});
+      setShowUnmute(stream.getAudioTracks().length > 0);
     } else {
       el.srcObject = null;
+      setShowUnmute(false);
     }
   }, [stream]);
 
+  const enableSound = () => {
+    const el = ref.current;
+    if (!el) return;
+    el.muted = false;
+    el.volume = 1;
+    el.play()
+      .then(() => setShowUnmute(false))
+      .catch(() => {});
+  };
+
   return (
-    <video
-      ref={ref}
-      className="live-video"
-      src={stream ? undefined : fallbackSrc}
-      poster={poster}
-      autoPlay
-      muted
-      loop={!stream}
-      playsInline
-    />
+    <>
+      <video
+        ref={ref}
+        className="live-video"
+        src={stream ? undefined : fallbackSrc}
+        poster={poster}
+        autoPlay
+        muted={!stream}
+        loop={!stream}
+        playsInline
+      />
+      {stream && showUnmute && (
+        <button className="unmute-chip" onClick={enableSound}>
+          <Icon name="volume_up" filled size={16} /> Tap for sound
+        </button>
+      )}
+    </>
   );
 }
 

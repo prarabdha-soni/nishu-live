@@ -36,12 +36,15 @@ export interface HostRoom {
  */
 export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled: boolean): HostRoom {
   const botsEnabled = pace !== 'Off';
-  const room = useAuctionRoom(seller, lots, botsEnabled ? pace : 'Lively', enabled, botsEnabled);
 
   const [channelReady, setChannelReady] = useState(false);
   const [viewers, setViewers] = useState(0);
   const [live, setLive] = useState(false);
   const [ordersReceived, setOrdersReceived] = useState<OrderAnnounce[]>([]);
+
+  // The auction clock only runs once the seller actually goes live — no bidding
+  // starts on its own just because the studio tab is open.
+  const room = useAuctionRoom(seller, lots, botsEnabled ? pace : 'Lively', enabled && live, botsEnabled);
 
   const uid = getUid();
   const channelRef = useRef<RealtimeChannel | null>(null);
@@ -53,6 +56,35 @@ export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled
   const roomRef = useRef(room);
   roomRef.current = room;
   const viewersRef = useRef(0);
+
+  // Send the current authoritative state to the room. Reads refs so it's safe
+  // to call from intervals and event handlers without stale closures.
+  const broadcast = useCallback(() => {
+    const ch = channelRef.current;
+    if (!ch) return;
+    const s = roomRef.current.state;
+    const nextBid = roomRef.current.nextBid;
+    void ch.send({
+      type: 'broadcast',
+      event: 'auction.state',
+      payload: {
+        sellerId: seller.id,
+        lotIndex: s.lotIndex,
+        currentBid: s.currentBid,
+        bidCount: s.bidCount,
+        bidder: s.bidder ? { handle: s.bidder.handle, color: s.bidder.color, uid: s.bidder.uid ?? null } : null,
+        timeLeft: s.timeLeft,
+        status: s.status === 'open' ? 'open' : 'ended',
+        soldPrice: s.soldPrice,
+        nextBid,
+        validAmounts: quickChips(nextBid),
+        chat: s.chat.slice(-30),
+        viewers: viewersRef.current,
+        live: liveRef.current,
+        hostAt: Date.now(),
+      },
+    });
+  }, [seller.id]);
 
   /* ---- channel lifecycle ---- */
 
@@ -104,6 +136,8 @@ export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled
       const count = entries.filter((e) => e.role === 'viewer').length;
       viewersRef.current = count;
       setViewers(count);
+      // a newly joined viewer needs the current state (incl. live status) right away
+      broadcast();
       // close peer connections for viewers that left
       const present = new Set(entries.map((e) => e.uid));
       for (const [peerUid, pc] of peersRef.current) {
@@ -151,29 +185,15 @@ export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled
 
   useEffect(() => {
     if (!enabled || !channelReady) return;
-    const s = room.state;
-    const nextBid = room.nextBid;
-    void channelRef.current?.send({
-      type: 'broadcast',
-      event: 'auction.state',
-      payload: {
-        sellerId: seller.id,
-        lotIndex: s.lotIndex,
-        currentBid: s.currentBid,
-        bidCount: s.bidCount,
-        bidder: s.bidder ? { handle: s.bidder.handle, color: s.bidder.color, uid: s.bidder.uid ?? null } : null,
-        timeLeft: s.timeLeft,
-        status: s.status === 'open' ? 'open' : 'ended',
-        soldPrice: s.soldPrice,
-        nextBid,
-        validAmounts: quickChips(nextBid),
-        chat: s.chat.slice(-30),
-        viewers: viewersRef.current,
-        live: liveRef.current,
-        hostAt: Date.now(),
-      },
-    });
-  }, [enabled, channelReady, room.state, room.nextBid, seller.id, live]);
+    broadcast();
+  }, [enabled, channelReady, room.state, room.nextBid, live, broadcast]);
+
+  // heartbeat: keep idle/late viewers converged on the current state + live flag
+  useEffect(() => {
+    if (!enabled || !channelReady) return;
+    const t = setInterval(broadcast, 2500);
+    return () => clearInterval(t);
+  }, [enabled, channelReady, broadcast]);
 
   /* ---- controls ---- */
 

@@ -34,6 +34,8 @@ export interface LiveRoom extends AuctionRoom {
   mode: LiveMode;
   remoteStream: MediaStream | null;
   broadcasting: boolean;
+  /** true before the seller goes live — auction is paused, bidding disabled */
+  waiting: boolean;
 }
 
 const CHAT_CAP = 40;
@@ -276,7 +278,7 @@ function useSocketRoom(seller: Seller, lots: Lot[], enabled: boolean): LiveRoom 
 
   return useMemo<LiveRoom>(() => {
     if (mode !== 'server' || !srv) {
-      return { ...sim, mode, remoteStream: null, broadcasting: false };
+      return { ...sim, mode, remoteStream: null, broadcasting: false, waiting: false };
     }
 
     const myId = myIdRef.current;
@@ -314,6 +316,7 @@ function useSocketRoom(seller: Seller, lots: Lot[], enabled: boolean): LiveRoom 
       mode,
       remoteStream,
       broadcasting: srv.broadcasting,
+      waiting: false,
     };
   }, [mode, srv, sim, timeLeft, bidKey, won, remoteStream, placeBid, sendChat, continueToNext]);
 }

@@ -6,8 +6,7 @@ import { nextId } from '../lib/format';
 import { quickChips, type RoomState } from './engine';
 import { RTC_CONFIG } from './socket';
 import { liveChannel } from './supabase';
-import { useAuctionRoom } from './useAuctionRoom';
-import type { LiveRoom } from './useLiveRoom';
+import type { LiveMode, LiveRoom } from './useLiveRoom';
 
 interface HostSnapshot {
   sellerId: string;
@@ -53,8 +52,8 @@ export function useSupabaseRoom(seller: Seller, lots: Lot[], enabled: boolean): 
   const wonRef = useRef(won);
   wonRef.current = won;
 
-  const simEnabled = enabled && graceOver && !hostSeen;
-  const sim = useAuctionRoom(seller, lots, 'Lively', simEnabled);
+  // waiting = the seller hasn't started the auction yet (no live host on the channel)
+  const isLive = hostSeen && !!snap?.live;
 
   useEffect(() => {
     if (!enabled) return;
@@ -131,11 +130,8 @@ export function useSupabaseRoom(seller: Seller, lots: Lot[], enabled: boolean): 
   const placeBid = useCallback(
     (amount?: number) => {
       const s = snapRef.current;
-      if (!hostSeen || !s) {
-        sim.placeBid(amount);
-        return;
-      }
-      if (s.status !== 'open') return;
+      // no bidding until the seller is live and the lot is open
+      if (!s || !s.live || s.status !== 'open') return;
       const amt = amount ?? s.nextBid;
       if (!s.validAmounts.includes(amt)) return;
       void channelRef.current?.send({
@@ -148,66 +144,67 @@ export function useSupabaseRoom(seller: Seller, lots: Lot[], enabled: boolean): 
         prev ? { ...prev, currentBid: amt, bidCount: prev.bidCount + 1, bidder: { handle, color, uid } } : prev,
       );
     },
-    [hostSeen, sim, uid, handle, color],
+    [uid, handle, color],
   );
 
   const sendChat = useCallback(
     (text: string) => {
-      if (!hostSeen) {
-        sim.sendChat(text);
-        return;
-      }
+      // chatting is allowed while waiting for the seller to start
       const trimmed = text.trim().slice(0, 200);
       if (trimmed) {
         void channelRef.current?.send({ type: 'broadcast', event: 'chat.send', payload: { uid, handle, color, text: trimmed } });
       }
     },
-    [hostSeen, sim, uid, handle, color],
+    [uid, handle, color],
   );
 
   const continueToNext = useCallback(() => {
-    if (!hostSeen) {
-      sim.continueToNext();
-      return;
-    }
     setWon(null); // host advances the room on its own
-  }, [hostSeen, sim]);
+  }, []);
 
   /* ---- compose ---- */
 
   return useMemo<LiveRoom>(() => {
-    if (!enabled || !hostSeen || !snap) {
-      return { ...sim, mode: graceOver ? 'sim' : 'connecting', remoteStream: null, broadcasting: false };
-    }
+    const waiting = !won && !isLive;
+    const lotIndex = won
+      ? Math.max(0, lots.findIndex((l) => l.id === won.lot.id))
+      : snap?.lotIndex ?? 0;
+    const lot = won ? won.lot : lots[lotIndex] ?? lots[0];
+    const showBidder = !waiting && snap?.bidder;
 
-    const lot = won ? won.lot : (lots[snap.lotIndex] ?? lots[0]);
     const state: RoomState = {
       lots,
-      lotIndex: won ? Math.max(0, lots.findIndex((l) => l.id === won.lot.id)) : snap.lotIndex,
-      currentBid: won ? won.price : snap.currentBid,
-      bidCount: snap.bidCount,
-      bidder: snap.bidder ? { handle: snap.bidder.handle, color: snap.bidder.color, isYou: snap.bidder.uid === uid } : null,
-      youWin: won ? true : snap.bidder?.uid === uid,
-      timeLeft: won ? 0 : snap.timeLeft,
-      status: won ? 'won' : snap.status === 'ended' ? 'sold' : 'open',
-      soldPrice: won ? won.price : snap.soldPrice,
-      chat: snap.chat,
-      viewers: snap.viewers,
-      bidKey: snap.bidCount, // pops on every accepted bid
+      lotIndex,
+      currentBid: won ? won.price : snap?.currentBid ?? lot.start,
+      bidCount: snap?.bidCount ?? 0,
+      bidder: showBidder
+        ? { handle: snap!.bidder!.handle, color: snap!.bidder!.color, isYou: snap!.bidder!.uid === uid }
+        : null,
+      youWin: won ? true : !waiting && snap?.bidder?.uid === uid,
+      timeLeft: won ? 0 : snap?.timeLeft ?? 15,
+      status: won ? 'won' : waiting ? 'open' : snap?.status === 'ended' ? 'sold' : 'open',
+      soldPrice: won ? won.price : snap?.soldPrice ?? null,
+      chat: snap?.chat ?? [],
+      viewers: snap?.viewers ?? 0,
+      bidKey: snap?.bidCount ?? 0,
     };
+
+    const nextBid = snap?.nextBid ?? lot.start;
+    const mode: LiveMode = hostSeen ? 'server' : graceOver ? 'sim' : 'connecting';
 
     return {
       state,
       lot,
-      nextBid: snap.nextBid,
-      chips: snap.validAmounts.length === 3 ? snap.validAmounts : quickChips(snap.nextBid),
+      nextBid,
+      chips: snap?.validAmounts.length === 3 ? snap.validAmounts : quickChips(nextBid),
       placeBid,
       injectBid: () => false,
       sendChat,
       continueToNext,
-      mode: 'server',
+      mode,
       remoteStream,
-      broadcasting: snap.live,
+      broadcasting: !!snap?.live,
+      waiting,
     };
-  }, [enabled, hostSeen, snap, sim, won, lots, uid, remoteStream, graceOver, placeBid, sendChat, continueToNext]);
+  }, [isLive, hostSeen, graceOver, snap, won, lots, uid, remoteStream, placeBid, sendChat, continueToNext]);
 }

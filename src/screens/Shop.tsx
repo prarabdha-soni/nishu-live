@@ -1,11 +1,34 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useMemo, useState } from 'react';
 import { Icon } from '../components/Icon';
-import { SHOP_CATEGORIES } from '../data/seed';
+import { ProductImage } from '../components/ProductImage';
+import { SHOP_PRODUCTS, type ShopProduct } from '../data/seed';
+import { rupees } from '../lib/format';
+
+const FILTERS = ['All', 'Saree', 'Kurti', 'Jewellery', 'Accessories'] as const;
+type Filter = (typeof FILTERS)[number];
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 export function Shop() {
   const [query, setQuery] = useState('');
-  const cats = SHOP_CATEGORIES.filter((c) => c.name.toLowerCase().includes(query.toLowerCase()));
+  const [filter, setFilter] = useState<Filter>('All');
+
+  // shuffle once per mount for a fresh "picked for you" feel
+  const shuffled = useMemo(() => shuffle(SHOP_PRODUCTS), []);
+
+  const products = shuffled.filter((p) => {
+    if (filter !== 'All' && p.category !== filter) return false;
+    if (!query) return true;
+    const q = query.toLowerCase();
+    return p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q);
+  });
 
   return (
     <div className="screen shop">
@@ -13,25 +36,48 @@ export function Shop() {
       <div className="search-pill">
         <Icon name="search" size={20} />
         <input
-          placeholder="Search collections"
+          placeholder="Search products"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          aria-label="Search collections"
+          aria-label="Search products"
         />
       </div>
 
-      <div className="cat-list">
-        {cats.map((c) => (
-          <Link key={c.id} to={c.to} className="cat-card" style={{ background: c.bg }}>
-            <div className="cat-info">
-              <div className="cat-name">{c.name}</div>
-              <div className="cat-count">{c.count} items</div>
-            </div>
-            <div className="cat-img">
-              <img src={c.imageUrl} alt={c.name} loading="lazy" />
-            </div>
-          </Link>
+      <div className="chip-row shop-filters">
+        {FILTERS.map((f) => (
+          <button
+            key={f}
+            className={`select-chip ${filter === f ? 'active' : ''}`}
+            onClick={() => setFilter(f)}
+          >
+            {f}
+          </button>
         ))}
+      </div>
+
+      <div className="product-grid">
+        {products.map((p) => (
+          <ProductCard key={p.id} product={p} />
+        ))}
+        {products.length === 0 && <p className="empty-note">No products match that search.</p>}
+      </div>
+    </div>
+  );
+}
+
+function ProductCard({ product }: { product: ShopProduct }) {
+  return (
+    <div className="product-card">
+      <ProductImage src={product.imageUrl} alt={product.name} material={product.material} className="product-img" />
+      <div className="product-body">
+        <div className="product-cat">{product.category}</div>
+        <div className="product-name">{product.name}</div>
+        <div className="product-price-row">
+          <span className="product-price">{rupees(product.price)}</span>
+          <button className="add-btn" aria-label={`Add ${product.name}`}>
+            <Icon name="add" size={18} />
+          </button>
+        </div>
       </div>
     </div>
   );
