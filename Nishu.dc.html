@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .nx-hide-sb::-webkit-scrollbar{display:none}
+  .nx-hide-sb{scrollbar-width:none}
+  @keyframes chatIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes floatY{0%,100%{transform:translateX(-50%) translateY(0) rotate(-3deg)}50%{transform:translateX(-50%) translateY(-14px) rotate(3deg)}}
+  @keyframes bidPop{0%{transform:scale(1)}40%{transform:scale(1.14)}100%{transform:scale(1)}}
+  @keyframes soldIn{0%{opacity:0;transform:scale(.7)}55%{transform:scale(1.07)}100%{opacity:1;transform:scale(1)}}
+  @keyframes dotPulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @keyframes ringPulse{0%{box-shadow:0 0 0 0 rgba(245,51,63,.5)}70%{box-shadow:0 0 0 9px rgba(245,51,63,0)}100%{box-shadow:0 0 0 0 rgba(245,51,63,0)}}
+</style>
+</helmet>
+<div style="min-height:100vh;width:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 120% at 50% 0%, #EFEAE4 0%, #E1DAD2 100%);padding:28px 16px;font-family:'Hanken Grotesk',sans-serif">
+  <div style="position:relative;width:390px;height:844px;background:#FBF8F5;border-radius:46px;overflow:hidden;box-shadow:0 40px 90px -30px rgba(40,28,20,.45),0 0 0 1px rgba(0,0,0,.04);display:flex;flex-direction:column">
+
+    <sc-if value="{{ isLive }}" hint-placeholder-val="{{ false }}"><div style="{{ liveBg }}"></div></sc-if>
+
+    <!-- STATUS BAR -->
+    <div style="position:relative;z-index:30;flex:0 0 auto;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 26px 0 30px">
+      <div style="{{ statusStyle }}"><span style="font-size:15px;font-weight:700;letter-spacing:.3px">20:47</span></div>
+      <div style="{{ statusStyle }}"><span style="display:inline-flex;align-items:center;gap:7px;font-family:'Material Symbols Rounded';font-size:17px;line-height:1"><span>signal_cellular_alt</span><span>wifi</span><span style="font-size:19px">battery_full</span></span></div>
+    </div>
+
+    <!-- CONTENT -->
+    <div style="position:relative;z-index:1;flex:1 1 auto;overflow:hidden">
+
+      <!-- ============ HOME (single-seller storefront) ============ -->
+      <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div data-screen-label="Home" class="nx-hide-sb" style="position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:92px">
+        <div style="display:flex;align-items:center;gap:9px;padding:6px 18px 16px">
+          <div style="flex:1;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #EFE7E0;border-radius:999px;padding:11px 15px;color:#A79E97">
+            <span style="font-family:'Material Symbols Rounded';font-size:21px">search</span>
+            <span style="font-size:14.5px;font-weight:500">Search Nishu</span>
+          </div>
+          <div style="width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid #EFE7E0;display:flex;align-items:center;justify-content:center;color:#3A332E"><span style="font-family:'Material Symbols Rounded';font-size:21px">chat_bubble</span></div>
+          <div onClick="{{ goActivity }}" style="width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid #EFE7E0;display:flex;align-items:center;justify-content:center;color:#3A332E;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:21px">notifications</span></div>
+          <div style="width:40px;height:40px;border-radius:50%;background:#1C1A19;display:flex;align-items:center;justify-content:center;color:#FFD84D"><span style="font-family:'Material Symbols Rounded';font-size:21px;font-variation-settings:'FILL' 1">redeem</span></div>
+        </div>
+
+        <div style="display:flex;gap:12px;padding:0 18px 22px">
+          <div onClick="{{ enterLive }}" style="flex:1;height:92px;border-radius:18px;background:#F5C518;position:relative;overflow:hidden;cursor:pointer;box-shadow:0 10px 22px -12px rgba(245,197,24,.7)">
+            <span style="position:absolute;left:16px;top:0;bottom:0;display:flex;align-items:center;font-size:16.5px;font-weight:800;color:#1C1A19">For You</span>
+            <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;background:#FFF3C4;display:flex;align-items:flex-end;justify-content:center;overflow:hidden"><span style="font-family:'Material Symbols Rounded';font-size:42px;color:#1C1A19;font-variation-settings:'FILL' 1">person</span></span>
+          </div>
+          <div onClick="{{ goActivity }}" style="flex:1;height:92px;border-radius:18px;background:#F3E7E5;position:relative;overflow:hidden;cursor:pointer">
+            <span style="position:absolute;left:16px;top:16px;right:50px;font-size:15.5px;font-weight:800;color:#1C1A19;line-height:1.15">Followed Hosts</span>
+            <span style="position:absolute;right:12px;bottom:9px;font-family:'Material Symbols Rounded';font-size:40px;color:#F5A623;font-variation-settings:'FILL' 1">favorite</span>
+          </div>
+        </div>
+
+        <div style="padding:0 18px 14px"><span style="font-size:21px;font-weight:800;color:#1C1A19;letter-spacing:-.3px">Top Sellers</span></div>
+        <div style="display:flex;flex-direction:column;gap:16px;padding:0 18px 26px">
+
+          <div onClick="{{ enterLive }}" style="position:relative;height:152px;border-radius:22px;overflow:hidden;background:#F5EEE2;box-shadow:0 12px 26px -18px rgba(40,28,20,.45);cursor:pointer">
+            <div style="position:absolute;top:0;right:0;bottom:0;width:66%;-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,0),#000 30%);mask-image:linear-gradient(90deg,rgba(0,0,0,0),#000 30%)">
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="seller-jewelry" src="assets/seller-jewellery.png" placeholder="Drop jewellery photo" shape="rect" hint-size="100%,100%" style="display:block;width:100%;height:100%"></x-import>
+            </div>
+            <div style="position:absolute;left:20px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;z-index:2">
+              <div style="display:flex;align-items:center;gap:5px"><span style="font-size:21px;font-weight:800;color:#1C1A19;letter-spacing:-.3px">jewelrysparkle</span><span style="font-family:'Material Symbols Rounded';font-size:17px;color:#7B45C2;font-variation-settings:'FILL' 1">verified</span></div>
+              <div style="font-size:13px;font-weight:600;color:#9C8763;margin-top:2px">Jewellery</div>
+              <div style="display:inline-flex;align-self:flex-start;align-items:center;gap:6px;background:#F5333F;color:#fff;border-radius:9px;padding:6px 12px;font-size:12.5px;font-weight:800;margin-top:12px"><span style="width:6px;height:6px;border-radius:50%;background:#fff;animation:dotPulse 1.4s ease-in-out infinite"></span>Live · 128</div>
+            </div>
+          </div>
+
+          <div onClick="{{ enterLive }}" style="position:relative;height:152px;border-radius:22px;overflow:hidden;background:#EFE6FB;box-shadow:0 12px 26px -18px rgba(40,28,20,.45);cursor:pointer">
+            <div style="position:absolute;top:0;right:0;bottom:0;width:66%;-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,0),#000 30%);mask-image:linear-gradient(90deg,rgba(0,0,0,0),#000 30%)">
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="seller-saree" src="assets/seller-saree.png" placeholder="Drop saree photo" shape="rect" hint-size="100%,100%" style="display:block;width:100%;height:100%"></x-import>
+            </div>
+            <div style="position:absolute;left:20px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;z-index:2">
+              <div style="display:flex;align-items:center;gap:5px"><span style="font-size:21px;font-weight:800;color:#1C1A19;letter-spacing:-.3px">sareestyle</span><span style="font-family:'Material Symbols Rounded';font-size:17px;color:#7B45C2;font-variation-settings:'FILL' 1">verified</span></div>
+              <div style="font-size:13px;font-weight:600;color:#9179A8;margin-top:2px">Sarees</div>
+              <div style="display:inline-flex;align-self:flex-start;align-items:center;gap:6px;background:#F5333F;color:#fff;border-radius:9px;padding:6px 12px;font-size:12.5px;font-weight:800;margin-top:12px"><span style="width:6px;height:6px;border-radius:50%;background:#fff;animation:dotPulse 1.4s ease-in-out infinite"></span>Live · 142</div>
+            </div>
+          </div>
+
+          <div onClick="{{ enterLive }}" style="position:relative;height:152px;border-radius:22px;overflow:hidden;background:#FBEFE0;box-shadow:0 12px 26px -18px rgba(40,28,20,.45);cursor:pointer">
+            <div style="position:absolute;top:0;right:0;bottom:0;width:66%;-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,0),#000 30%);mask-image:linear-gradient(90deg,rgba(0,0,0,0),#000 30%)">
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="seller-kurti" src="assets/seller-kurti.png" placeholder="Drop kurti photo" shape="rect" hint-size="100%,100%" style="display:block;width:100%;height:100%"></x-import>
+            </div>
+            <div style="position:absolute;left:20px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;z-index:2">
+              <div style="display:flex;align-items:center;gap:5px"><span style="font-size:21px;font-weight:800;color:#1C1A19;letter-spacing:-.3px">kurticollection</span><span style="font-family:'Material Symbols Rounded';font-size:17px;color:#7B45C2;font-variation-settings:'FILL' 1">verified</span></div>
+              <div style="font-size:13px;font-weight:600;color:#B08A66;margin-top:2px">Kurtis</div>
+              <div style="display:inline-flex;align-self:flex-start;align-items:center;gap:6px;background:#F5333F;color:#fff;border-radius:9px;padding:6px 12px;font-size:12.5px;font-weight:800;margin-top:12px"><span style="width:6px;height:6px;border-radius:50%;background:#fff;animation:dotPulse 1.4s ease-in-out infinite"></span>Live · 115</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ LIVE AUCTION ============ -->
+      <sc-if value="{{ isLive }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Live auction" style="position:absolute;inset:0;overflow:hidden">
+        <canvas ref="{{ feedRef }}" width="480" height="980" style="position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block"></canvas>
+        <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:1;display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.35);backdrop-filter:blur(6px);color:rgba(255,255,255,.9);border-radius:999px;padding:4px 11px;font-size:10.5px;font-weight:700;letter-spacing:.3px"><span style="font-family:'Material Symbols Rounded';font-size:14px">radio_button_checked</span>Live now · nishusilver</div>
+
+        <!-- header -->
+        <div style="position:absolute;top:8px;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:6px 14px;z-index:8">
+          <div onClick="{{ visitShop }}" style="display:flex;align-items:center;gap:10px;cursor:pointer">
+            <div style="width:42px;height:42px;border-radius:50%;overflow:hidden;position:relative;border:2px solid rgba(255,255,255,.85)"><div style="{{ sellerSwatch }}"></div></div>
+            <div style="line-height:1.2">
+              <div style="color:#fff;font-size:14px;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.4)">nishusilver</div>
+              <div style="display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.85);font-size:11px;font-weight:600"><span style="display:inline-flex;align-items:center;gap:2px"><span style="font-family:'Material Symbols Rounded';font-size:13px;color:#FFD24A;font-variation-settings:'FILL' 1">star</span>4.9</span><span style="display:inline-flex;align-items:center;gap:3px"><span style="font-family:'Material Symbols Rounded';font-size:14px">local_shipping</span>&lt;1d</span></div>
+            </div>
+            <button onClick="{{ toggleFollow }}" style="{{ liveFollowStyle }}">{{ liveFollowLabel }}</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);border-radius:999px;padding:6px 11px"><span style="width:18px;height:18px;border-radius:50%;background:#F5333F;display:flex;align-items:center;justify-content:center;color:#fff"><span style="font-family:'Material Symbols Rounded';font-size:13px">bar_chart</span></span><span style="color:#fff;font-size:12.5px;font-weight:800">{{ viewersLabel }}</span></div>
+            <button onClick="{{ backHome }}" style="width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.38);backdrop-filter:blur(8px);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:22px">expand_more</span></button>
+          </div>
+        </div>
+
+        <!-- show notes -->
+        <button onClick="{{ toggleNotes }}" style="position:absolute;top:60px;left:14px;z-index:8;display:flex;align-items:center;gap:6px;background:#FFF6CC;color:#5A4A00;border:none;border-radius:0 12px 12px 12px;padding:7px 11px;font-family:'Hanken Grotesk';font-size:11.5px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px -4px rgba(0,0,0,.3)"><span style="font-family:'Material Symbols Rounded';font-size:15px">gavel</span>Auction rules</button>
+        <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:96px;left:14px;width:250px;z-index:9;background:#FFFCEB;border-radius:14px;padding:14px 15px;box-shadow:0 16px 34px -12px rgba(0,0,0,.5)">
+            <div style="font-size:13px;font-weight:800;color:#3A332E;margin-bottom:7px">How bidding works</div>
+            <div style="font-size:12.5px;color:#6B635D;line-height:1.55">· $1 starts, no reserves<br>· Bid resets the clock under 6s (anti-snipe)<br>· Highest bid when the timer hits 0 wins<br>· Winners pay in-app · free insured shipping</div>
+            <button onClick="{{ toggleNotes }}" style="margin-top:10px;background:#1C1A19;color:#fff;border:none;border-radius:9px;padding:7px 13px;font-family:'Hanken Grotesk';font-size:11.5px;font-weight:700;cursor:pointer">Got it</button>
+          </div>
+        </sc-if>
+
+        <!-- action rail -->
+        <div style="position:absolute;right:9px;top:104px;display:flex;flex-direction:column;align-items:center;gap:18px;z-index:8">
+          <sc-for list="{{ rail }}" as="r" hint-placeholder-count="4">
+            <button onClick="{{ r.act }}" style="background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:0">
+              <span style="font-family:'Material Symbols Rounded';font-size:27px;color:#fff;line-height:1;text-shadow:0 1px 4px rgba(0,0,0,.5)">{{ r.icon }}</span>
+              <span style="font-size:10px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)">{{ r.label }}</span>
+            </button>
+          </sc-for>
+        </div>
+
+        <!-- bottom stack -->
+        <div style="position:absolute;left:0;right:0;bottom:0;z-index:7">
+          <div style="position:absolute;left:0;right:0;bottom:0;height:470px;background:linear-gradient(transparent,rgba(0,0,0,.22) 22%,rgba(0,0,0,.74));pointer-events:none"></div>
+
+          <sc-if value="{{ showChat }}" hint-placeholder-val="{{ true }}">
+          <div style="position:relative;padding:0 78px 8px 14px;display:flex;flex-direction:column-reverse;gap:8px;max-height:150px;overflow:hidden;pointer-events:none">
+            <sc-for list="{{ chat }}" as="m" hint-placeholder-count="4">
+              <div style="animation:chatIn .35s ease;display:flex;align-items:flex-start;gap:8px">
+                <div style="width:22px;height:22px;border-radius:50%;overflow:hidden;position:relative;flex:0 0 auto;margin-top:1px"><div style="{{ m.av }}"></div></div>
+                <div style="line-height:1.35;font-size:13px">
+                  <span style="{{ m.userStyle }}">{{ m.user }}</span>
+                  <sc-if value="{{ m.isMod }}" hint-placeholder-val="{{ false }}"><span style="background:rgba(255,255,255,.3);color:#fff;font-size:9.5px;font-weight:800;border-radius:5px;padding:1px 5px;margin:0 5px">Host</span></sc-if>
+                  <span style="{{ m.textStyle }}">{{ m.text }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          </sc-if>
+
+          <div style="position:relative;padding:0 14px 14px">
+            <button onClick="{{ say }}" style="width:100%;text-align:left;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:11px 16px;color:rgba(255,255,255,.75);cursor:pointer;margin-bottom:11px"><span style="font-size:14px;font-weight:600">Say something…</span></button>
+
+            <!-- AUCTION PANEL -->
+            <div style="background:rgba(14,11,9,.62);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:14px 15px 15px;box-shadow:0 16px 34px -14px rgba(0,0,0,.6)">
+              <div style="display:flex;align-items:center;gap:11px">
+                <div style="width:46px;height:46px;border-radius:11px;overflow:hidden;position:relative;flex:0 0 auto"><div style="{{ lotSwatch }}"></div></div>
+                <div style="flex:1;min-width:0;line-height:1.2">
+                  <div style="color:#fff;font-size:14.5px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ lotName }}</div>
+                  <div style="color:rgba(255,255,255,.55);font-size:11px;font-weight:600;margin-top:2px">{{ lotNoLabel }} · {{ bidCountLabel }}</div>
+                </div>
+                <div style="{{ timerBoxStyle }}">
+                  <span style="font-family:'Material Symbols Rounded';font-size:15px">timer</span>
+                  <span style="font-size:17px;font-weight:800;letter-spacing:.5px">{{ timeLabel }}</span>
+                </div>
+              </div>
+
+              <div style="height:1px;background:rgba(255,255,255,.12);margin:12px 0"></div>
+
+              <div style="display:flex;align-items:flex-end;justify-content:space-between">
+                <div style="line-height:1.05">
+                  <div style="font-size:9.5px;font-weight:800;letter-spacing:1px;color:rgba(255,255,255,.5)">{{ bidTopLabel }}</div>
+                  <div style="{{ bidNumStyle }}">{{ bidLabel }}</div>
+                </div>
+                <div style="text-align:right;line-height:1.25">
+                  <div style="{{ bidderChipStyle }}"><span style="font-family:'Material Symbols Rounded';font-size:13px;font-variation-settings:'FILL' 1">{{ bidderIcon }}</span>{{ bidderLabel }}</div>
+                </div>
+              </div>
+
+              <sc-if value="{{ statusText }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ statusStyleLive }}">{{ statusText }}</div>
+              </sc-if>
+
+              <div style="display:flex;gap:8px;margin-top:13px">
+                <sc-for list="{{ chips }}" as="c" hint-placeholder-count="3">
+                  <button onClick="{{ c.act }}" style="{{ c.style }}">{{ c.label }}</button>
+                </sc-for>
+              </div>
+
+              <button onClick="{{ placeBid }}" style="{{ placeStyle }}">
+                <span style="font-family:'Material Symbols Rounded';font-size:20px">{{ placeIcon }}</span>{{ placeLabel }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOLD / WON overlay -->
+        <sc-if value="{{ ended }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:10;padding:0 32px">
+            <div style="text-align:center;animation:soldIn .5s cubic-bezier(.2,.9,.3,1.2);width:100%">
+              <div style="{{ soldBadgeStyle }}">{{ soldBadge }}</div>
+              <div style="color:#fff;font-size:15px;font-weight:600;margin-top:16px;line-height:1.4">{{ soldLine }}</div>
+              <sc-if value="{{ won }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:10px;margin-top:22px">
+                  <button onClick="{{ payWin }}" style="background:#FF2D6F;border:none;color:#fff;border-radius:14px;padding:15px 0;font-family:'Hanken Grotesk';font-size:15.5px;font-weight:800;cursor:pointer;box-shadow:0 12px 26px -8px rgba(255,45,111,.7)">Pay now · {{ bidLabel }}</button>
+                  <button onClick="{{ nextLotBtn }}" style="background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:14px;padding:13px 0;font-family:'Hanken Grotesk';font-size:14px;font-weight:700;cursor:pointer">Keep watching</button>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <!-- ============ DETAIL ============ -->
+      <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Product detail" style="position:absolute;inset:0">
+        <div class="nx-hide-sb" style="position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:96px">
+          <div style="position:relative;width:100%;height:384px">
+            <div style="{{ detail.sw }}"></div>
+            <button onClick="{{ backHome }}" style="position:absolute;top:10px;left:16px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:none;display:flex;align-items:center;justify-content:center;color:#1C1A19;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:24px">chevron_left</span></button>
+            <div style="position:absolute;top:10px;right:16px;display:flex;gap:8px">
+              <button style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:none;display:flex;align-items:center;justify-content:center;color:#1C1A19;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:22px">ios_share</span></button>
+              <button style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:none;display:flex;align-items:center;justify-content:center;color:#FF2D6F;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:22px">favorite</span></button>
+            </div>
+            <div style="position:absolute;left:0;right:0;bottom:14px;display:flex;justify-content:center;gap:6px">
+              <span style="width:18px;height:5px;border-radius:3px;background:#fff"></span>
+              <span style="width:5px;height:5px;border-radius:3px;background:rgba(255,255,255,.55)"></span>
+              <span style="width:5px;height:5px;border-radius:3px;background:rgba(255,255,255,.55)"></span>
+            </div>
+          </div>
+
+          <div style="position:relative;margin-top:-22px;background:#FBF8F5;border-radius:26px 26px 0 0;padding:22px 22px 0">
+            <div style="font-size:23px;font-weight:800;color:#1C1A19;letter-spacing:-.4px;line-height:1.2">{{ detail.name }}</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px">
+              <div onClick="{{ visitShop }}" style="display:flex;align-items:center;gap:9px;cursor:pointer">
+                <div style="width:34px;height:34px;border-radius:50%;overflow:hidden;position:relative"><div style="{{ sellerSwatch }}"></div></div>
+                <div style="line-height:1.2"><div style="font-size:13.5px;font-weight:700;color:#1C1A19">Nishu Silver Jewellery</div><div style="font-size:11px;font-weight:600;color:#A79E97">Verified seller · Visit shop</div></div>
+              </div>
+              <div style="display:inline-flex;align-items:center;gap:3px;color:#C9A227"><span style="font-family:'Material Symbols Rounded';font-size:17px;font-variation-settings:'FILL' 1">star</span><span style="font-size:13px;font-weight:800;color:#3A332E">4.9</span></div>
+            </div>
+
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;margin:18px 0 4px">
+              <div><div style="font-size:11px;font-weight:700;color:#A79E97;letter-spacing:.4px">BUY NOW</div><div style="font-size:30px;font-weight:800;color:#FF2D6F;letter-spacing:-.8px">{{ detail.priceLabel }}</div></div>
+              <div onClick="{{ enterLive }}" style="text-align:right;cursor:pointer"><div style="font-size:11px;font-weight:700;color:#A79E97;letter-spacing:.4px">OR BID LIVE</div><div style="display:inline-flex;align-items:center;gap:5px;font-size:16px;font-weight:800;color:#1C1A19"><span style="font-family:'Material Symbols Rounded';font-size:18px;color:#F5333F">gavel</span>from $1</div></div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:18px">
+              <div style="background:#fff;border:1px solid #EFE7E0;border-radius:14px;padding:12px 14px"><div style="font-size:10.5px;font-weight:700;color:#A79E97;letter-spacing:.4px">METAL</div><div style="font-size:14px;font-weight:700;color:#1C1A19;margin-top:2px">{{ detail.metal }}</div></div>
+              <div style="background:#fff;border:1px solid #EFE7E0;border-radius:14px;padding:12px 14px"><div style="font-size:10.5px;font-weight:700;color:#A79E97;letter-spacing:.4px">STONE</div><div style="font-size:14px;font-weight:700;color:#1C1A19;margin-top:2px">{{ detail.stone }}</div></div>
+              <div style="background:#fff;border:1px solid #EFE7E0;border-radius:14px;padding:12px 14px"><div style="font-size:10.5px;font-weight:700;color:#A79E97;letter-spacing:.4px">SIZE</div><div style="font-size:14px;font-weight:700;color:#1C1A19;margin-top:2px">{{ detail.size }}</div></div>
+              <div style="background:#fff;border:1px solid #EFE7E0;border-radius:14px;padding:12px 14px"><div style="font-size:10.5px;font-weight:700;color:#A79E97;letter-spacing:.4px">HALLMARK</div><div style="font-size:14px;font-weight:700;color:#1C1A19;margin-top:2px">925 Sterling</div></div>
+            </div>
+
+            <div style="font-size:15px;font-weight:800;color:#1C1A19;margin:22px 0 8px">Details</div>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:#6B635D;text-wrap:pretty">Hand-finished 925 sterling silver, hallmarked and inspected in our studio. Ships insured with a certificate of authenticity and signature Nishu packaging. Free returns within 14 days.</p>
+
+            <div style="display:flex;align-items:center;gap:10px;margin-top:18px;padding:14px;background:#fff;border:1px solid #EFE7E0;border-radius:14px;color:#3A332E">
+              <span style="font-family:'Material Symbols Rounded';font-size:22px;color:#15B37D">local_shipping</span>
+              <div style="line-height:1.3"><div style="font-size:13.5px;font-weight:700;color:#1C1A19">Free insured shipping</div><div style="font-size:11.5px;font-weight:600;color:#A79E97">Arrives in 3–5 business days</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:11px;padding:12px 18px 22px;background:rgba(251,248,245,.9);backdrop-filter:blur(12px);border-top:1px solid #EFE7E0">
+          <button onClick="{{ enterLive }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:#fff;border:1.5px solid #1C1A19;color:#1C1A19;border-radius:14px;padding:14px 0;font-family:'Hanken Grotesk';font-size:14.5px;font-weight:800;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:18px;color:#F5333F">gavel</span>Bid live</button>
+          <button onClick="{{ detail.buy }}" style="flex:1.3;background:#1C1A19;border:none;color:#fff;border-radius:14px;padding:14px 0;font-family:'Hanken Grotesk';font-size:14.5px;font-weight:800;cursor:pointer">Buy · {{ detail.priceLabel }}</button>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ SELLER STOREFRONT ============ -->
+      <sc-if value="{{ isSeller }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Seller storefront" class="nx-hide-sb" style="position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:92px">
+        <div style="position:relative;height:150px;overflow:hidden">
+          <div style="{{ sellerSwatch }};filter:saturate(1.1)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.05),rgba(0,0,0,.3))"></div>
+          <button onClick="{{ backHome }}" style="position:absolute;top:10px;left:16px;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:none;display:flex;align-items:center;justify-content:center;color:#1C1A19;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:23px">chevron_left</span></button>
+        </div>
+
+        <div style="padding:0 22px">
+          <div style="display:flex;align-items:flex-end;gap:14px;margin-top:-38px">
+            <div style="width:84px;height:84px;border-radius:50%;overflow:hidden;position:relative;border:3px solid #FBF8F5;box-shadow:0 8px 18px -10px rgba(40,28,20,.5)"><div style="{{ sellerSwatch }}"></div></div>
+            <button onClick="{{ toggleFollow }}" style="{{ followStyle }}">{{ followLabel }}</button>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:7px;margin-top:13px">
+            <span style="font-size:22px;font-weight:800;color:#1C1A19;letter-spacing:-.3px">Nishu Silver Jewellery</span>
+            <span style="font-family:'Material Symbols Rounded';font-size:20px;color:#2A6FDB;font-variation-settings:'FILL' 1">verified</span>
+          </div>
+          <div style="font-size:12.5px;font-weight:600;color:#A79E97;margin-top:1px">@nishusilver</div>
+          <div style="display:flex;align-items:center;gap:14px;margin-top:9px">
+            <span style="display:inline-flex;align-items:center;gap:4px;color:#C9A227"><span style="font-family:'Material Symbols Rounded';font-size:17px;font-variation-settings:'FILL' 1">star</span><span style="font-size:13.5px;font-weight:800;color:#3A332E">4.9</span></span>
+            <span style="font-size:13px;font-weight:600;color:#6B635D"><b style="font-weight:800;color:#1C1A19">18.6k</b> followers</span>
+            <span style="font-size:13px;font-weight:600;color:#6B635D"><b style="font-weight:800;color:#1C1A19">4,480</b> sales</span>
+          </div>
+          <p style="margin:11px 0 0;font-size:13.5px;line-height:1.5;color:#6B635D;text-wrap:pretty">Handcrafted 925 sterling silver &amp; gemstone jewellery. Live silver auctions every night — $1 starts, no reserves.</p>
+
+          <div onClick="{{ enterLive }}" style="display:flex;align-items:center;gap:12px;margin-top:18px;padding:13px 14px;background:#fff;border:1px solid #EFE7E0;border-radius:16px;cursor:pointer">
+            <div style="position:relative;width:46px;height:46px;border-radius:12px;overflow:hidden"><div style="{{ lotSwatch }}"></div><div style="position:absolute;inset:0;background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-size:22px;color:#fff;font-variation-settings:'FILL' 1">play_arrow</span></div></div>
+            <div style="flex:1;line-height:1.3"><div style="font-size:13.5px;font-weight:800;color:#1C1A19">Silver Auction Night — live</div><div style="font-size:12px;font-weight:600;color:#A79E97">{{ viewersLabel }} watching · {{ bidCountLabel }}</div></div>
+            <span style="display:flex;align-items:center;gap:5px;background:#F5333F;color:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:800;white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:#fff"></span>Watch</span>
+          </div>
+
+          <div style="font-size:16px;font-weight:800;color:#1C1A19;margin:22px 0 13px">Listings</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <sc-for list="{{ shopItems }}" as="item" hint-placeholder-count="6">
+              <div onClick="{{ item.open }}" style="cursor:pointer">
+                <div style="position:relative;width:100%;aspect-ratio:1/1;border-radius:18px;overflow:hidden;box-shadow:0 8px 20px -12px rgba(40,28,20,.4)">
+                  <div style="{{ item.sw }}"></div>
+                  <div style="position:absolute;left:9px;bottom:9px;background:rgba(0,0,0,.4);backdrop-filter:blur(6px);color:#fff;border-radius:999px;padding:3px 9px;font-size:10.5px;font-weight:700">{{ item.priceLabel }}</div>
+                </div>
+                <div style="font-size:13px;font-weight:700;color:#1C1A19;margin-top:8px;line-height:1.25">{{ item.name }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ SHOP (full-width photo cards) ============ -->
+      <sc-if value="{{ isCategories }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Shop collection" class="nx-hide-sb" style="position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:92px">
+        <div style="padding:6px 22px 14px"><span style="font-size:27px;font-weight:800;color:#1C1A19;letter-spacing:-.5px">Shop collection</span></div>
+        <div style="padding:0 22px 18px">
+          <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #EFE7E0;border-radius:16px;padding:13px 15px;color:#A79E97">
+            <span style="font-family:'Material Symbols Rounded';font-size:21px">search</span>
+            <span style="font-size:14.5px;font-weight:500">Search the collection</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;padding:0 22px 24px">
+
+          <div style="position:relative;height:158px;border-radius:22px;overflow:hidden;background:#EEE4FB;box-shadow:0 12px 26px -18px rgba(40,28,20,.45)">
+            <div style="position:absolute;top:0;right:0;bottom:0;width:64%;-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,0),#000 26%);mask-image:linear-gradient(90deg,rgba(0,0,0,0),#000 26%)">
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="shop-saree" src="assets/seller-saree.png" placeholder="Drop saree photo" shape="rect" hint-size="100%,100%" style="display:block;width:100%;height:100%"></x-import>
+            </div>
+            <div onClick="{{ visitShop }}" style="position:absolute;left:22px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;z-index:2;cursor:pointer">
+              <div style="font-size:27px;font-weight:800;color:#5B2A86;letter-spacing:-.4px">Saree</div>
+              <div style="font-size:14px;font-weight:600;color:#9179A8;margin-top:4px">120 items</div>
+            </div>
+          </div>
+
+          <div style="position:relative;height:158px;border-radius:22px;overflow:hidden;background:#FAEEE0;box-shadow:0 12px 26px -18px rgba(40,28,20,.45)">
+            <div style="position:absolute;top:0;right:0;bottom:0;width:64%;-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,0),#000 26%);mask-image:linear-gradient(90deg,rgba(0,0,0,0),#000 26%)">
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="shop-kurti" src="assets/seller-kurti.png" placeholder="Drop kurti photo" shape="rect" hint-size="100%,100%" style="display:block;width:100%;height:100%"></x-import>
+            </div>
+            <div onClick="{{ visitShop }}" style="position:absolute;left:22px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;z-index:2;cursor:pointer">
+              <div style="font-size:27px;font-weight:800;color:#7A4A1E;letter-spacing:-.4px">Kurti</div>
+              <div style="font-size:14px;font-weight:600;color:#B08A66;margin-top:4px">150 items</div>
+            </div>
+          </div>
+
+          <div style="position:relative;height:158px;border-radius:22px;overflow:hidden;background:#FBE5EC;box-shadow:0 12px 26px -18px rgba(40,28,20,.45)">
+            <div style="position:absolute;top:0;right:0;bottom:0;width:64%;-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,0),#000 26%);mask-image:linear-gradient(90deg,rgba(0,0,0,0),#000 26%)">
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="shop-lehenga" src="assets/shop-lehenga.png" placeholder="Drop lehenga photo" shape="rect" hint-size="100%,100%" style="display:block;width:100%;height:100%"></x-import>
+            </div>
+            <div onClick="{{ visitShop }}" style="position:absolute;left:22px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;z-index:2;cursor:pointer">
+              <div style="font-size:27px;font-weight:800;color:#9C2A4E;letter-spacing:-.4px">Lehenga</div>
+              <div style="font-size:14px;font-weight:600;color:#C77E93;margin-top:4px">90 items</div>
+            </div>
+          </div>
+
+          <div style="position:relative;height:158px;border-radius:22px;overflow:hidden;background:#F5EEE0;box-shadow:0 12px 26px -18px rgba(40,28,20,.45)">
+            <div style="position:absolute;top:0;right:0;bottom:0;width:64%;-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,0),#000 26%);mask-image:linear-gradient(90deg,rgba(0,0,0,0),#000 26%)">
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="shop-jewellery" src="assets/seller-jewellery.png" placeholder="Drop jewellery photo" shape="rect" hint-size="100%,100%" style="display:block;width:100%;height:100%"></x-import>
+            </div>
+            <div onClick="{{ visitShop }}" style="position:absolute;left:22px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;z-index:2;cursor:pointer">
+              <div style="font-size:27px;font-weight:800;color:#6E5426;letter-spacing:-.4px">Jewellery</div>
+              <div style="font-size:14px;font-weight:600;color:#A88E5E;margin-top:4px">200 items</div>
+            </div>
+          </div>
+
+          <div style="position:relative;height:158px;border-radius:22px;overflow:hidden;background:#E6F4EC;box-shadow:0 12px 26px -18px rgba(40,28,20,.45)">
+            <div style="position:absolute;top:0;right:0;bottom:0;width:64%;-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,0),#000 26%);mask-image:linear-gradient(90deg,rgba(0,0,0,0),#000 26%)">
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="shop-accessories" src="assets/shop-accessories.png" placeholder="Drop accessory photo" shape="rect" hint-size="100%,100%" style="display:block;width:100%;height:100%"></x-import>
+            </div>
+            <div onClick="{{ visitShop }}" style="position:absolute;left:22px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;z-index:2;cursor:pointer">
+              <div style="font-size:27px;font-weight:800;color:#1E6E4A;letter-spacing:-.4px">Accessories</div>
+              <div style="font-size:14px;font-weight:600;color:#6BA588;margin-top:4px">140 items</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ SELL ============ -->
+      <sc-if value="{{ isSell }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Sell" class="nx-hide-sb" style="position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:6px 22px 92px">
+
+        <sc-if value="{{ sellDone }}" hint-placeholder-val="{{ false }}">
+          <div style="min-height:660px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+            <div style="width:92px;height:92px;border-radius:50%;background:#EAF8F1;display:flex;align-items:center;justify-content:center;animation:soldIn .5s cubic-bezier(.2,.9,.3,1.2)"><span style="font-family:'Material Symbols Rounded';font-size:54px;color:#15B37D;font-variation-settings:'FILL' 1">mark_email_read</span></div>
+            <div style="font-size:24px;font-weight:800;color:#1C1A19;letter-spacing:-.4px;margin-top:20px">Application received</div>
+            <div style="font-size:14px;font-weight:500;color:#6B635D;margin-top:8px;line-height:1.55">Thanks, <b style="color:#1C1A19">{{ sellName }}</b>! Our team is reviewing your shop. We'll notify you at <b style="color:#1C1A19">{{ sellContact }}</b> once you're approved to go live.</div>
+            <div style="display:inline-flex;align-items:center;gap:8px;background:#FFF3C4;color:#7A5A00;border-radius:999px;padding:9px 15px;font-size:12.5px;font-weight:800;margin-top:20px"><span style="font-family:'Material Symbols Rounded';font-size:17px">schedule</span>Typical review · under 24 hours</div>
+            <button onClick="{{ resetSell }}" style="width:100%;background:#1C1A19;border:none;color:#fff;border-radius:14px;padding:15px 0;font-family:'Hanken Grotesk';font-size:15px;font-weight:800;margin-top:30px;cursor:pointer">Done</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sellFormOpen }}" hint-placeholder-val="{{ true }}">
+          <div style="font-size:27px;font-weight:800;color:#1C1A19;letter-spacing:-.5px">Become a seller</div>
+          <p style="margin:7px 0 22px;font-size:14px;color:#6B635D;line-height:1.55">Tell us about your shop. We review every application and notify you when you're approved to host live auctions.</p>
+
+          <div style="font-size:11px;font-weight:800;letter-spacing:.6px;color:#A79E97;margin-bottom:8px">SHOP / BRAND NAME</div>
+          <input value="{{ sellForm.shop }}" onInput="{{ onSellShop }}" placeholder="e.g. Nishu Silver Jewellery" style="width:100%;background:#fff;border:1.5px solid #EFE7E0;border-radius:14px;padding:14px 15px;font-family:'Hanken Grotesk';font-size:14.5px;font-weight:600;color:#1C1A19;outline:none" style-focus="border:1.5px solid #FF2D6F">
+
+          <div style="font-size:11px;font-weight:800;letter-spacing:.6px;color:#A79E97;margin:20px 0 10px">WHAT DO YOU SELL?</div>
+          <div style="display:flex;flex-wrap:wrap;gap:9px">
+            <sc-for list="{{ sellCats }}" as="c" hint-placeholder-count="5">
+              <button onClick="{{ c.act }}" style="{{ c.style }}">{{ c.label }}</button>
+            </sc-for>
+          </div>
+
+          <div style="font-size:11px;font-weight:800;letter-spacing:.6px;color:#A79E97;margin:20px 0 8px">ABOUT YOUR PRODUCTS</div>
+          <textarea value="{{ sellForm.about }}" onInput="{{ onSellAbout }}" placeholder="What makes your pieces special? Materials, craft, hallmarks…" rows="3" style="width:100%;background:#fff;border:1.5px solid #EFE7E0;border-radius:14px;padding:14px 15px;font-family:'Hanken Grotesk';font-size:14px;font-weight:500;color:#1C1A19;outline:none;resize:none;line-height:1.5" style-focus="border:1.5px solid #FF2D6F"></textarea>
+
+          <div style="font-size:11px;font-weight:800;letter-spacing:.6px;color:#A79E97;margin:20px 0 10px">HOW OFTEN WILL YOU GO LIVE?</div>
+          <div style="display:flex;gap:9px">
+            <sc-for list="{{ sellFreqs }}" as="f" hint-placeholder-count="3">
+              <button onClick="{{ f.act }}" style="{{ f.style }}">{{ f.label }}</button>
+            </sc-for>
+          </div>
+
+          <div style="font-size:11px;font-weight:800;letter-spacing:.6px;color:#A79E97;margin:20px 0 8px">WHERE SHOULD WE NOTIFY YOU?</div>
+          <input value="{{ sellForm.contact }}" onInput="{{ onSellContact }}" placeholder="Email or phone number" style="width:100%;background:#fff;border:1.5px solid #EFE7E0;border-radius:14px;padding:14px 15px;font-family:'Hanken Grotesk';font-size:14.5px;font-weight:600;color:#1C1A19;outline:none" style-focus="border:1.5px solid #FF2D6F">
+
+          <button onClick="{{ submitSell }}" style="{{ submitStyle }}">Submit application</button>
+          <div style="display:flex;align-items:center;justify-content:center;gap:7px;margin-top:12px;color:#A79E97"><span style="font-family:'Material Symbols Rounded';font-size:17px">verified_user</span><span style="font-size:12px;font-weight:600">We review every seller. You'll be notified within 24 hours.</span></div>
+        </sc-if>
+
+      </div>
+      </sc-if>
+
+      <!-- ============ ACTIVITY ============ -->
+      <sc-if value="{{ isActivity }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Activity" class="nx-hide-sb" style="position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:6px 0 92px">
+        <div style="padding:0 22px 16px"><span style="font-size:27px;font-weight:800;color:#1C1A19;letter-spacing:-.5px">Activity</span></div>
+        <div onClick="{{ enterLive }}" style="margin:0 22px 18px;display:flex;align-items:center;gap:13px;background:#fff;border:1px solid #EFE7E0;border-radius:16px;padding:13px;cursor:pointer">
+          <div style="width:52px;height:52px;border-radius:14px;overflow:hidden;position:relative;flex:0 0 auto;animation:ringPulse 2.2s ease-out infinite;border-radius:14px"><div style="{{ lotSwatch }}"></div></div>
+          <div style="flex:1;line-height:1.3"><div style="font-size:14px;font-weight:800;color:#1C1A19">nishusilver is live now</div><div style="font-size:12.5px;font-weight:600;color:#A79E97">Silver Auction Night · {{ viewersLabel }} watching</div></div>
+          <span style="display:inline-flex;align-items:center;gap:5px;background:#F5333F;color:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:800"><span style="width:6px;height:6px;border-radius:50%;background:#fff;animation:dotPulse 1.4s ease-in-out infinite"></span>Join</span>
+        </div>
+        <div style="height:8px;background:#F3ECE6"></div>
+        <div style="padding:6px 0">
+          <sc-for list="{{ activity }}" as="a" hint-placeholder-count="5">
+            <div onClick="{{ a.open }}" style="display:flex;align-items:center;gap:13px;padding:13px 22px;cursor:pointer">
+              <div style="width:42px;height:42px;border-radius:12px;background:{{ a.bg }};display:flex;align-items:center;justify-content:center;flex:0 0 auto;color:{{ a.fg }}"><span style="font-family:'Material Symbols Rounded';font-size:22px;font-variation-settings:'FILL' 1">{{ a.icon }}</span></div>
+              <div style="flex:1;line-height:1.35"><div style="font-size:14px;font-weight:700;color:#1C1A19">{{ a.title }}</div><div style="font-size:12.5px;font-weight:500;color:#A79E97">{{ a.sub }}</div></div>
+              <span style="font-size:11.5px;font-weight:600;color:#C2B8B0">{{ a.time }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ ACCOUNT ============ -->
+      <sc-if value="{{ isAccount }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Account" class="nx-hide-sb" style="position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:6px 0 92px">
+        <div style="display:flex;align-items:center;gap:14px;padding:10px 22px 18px">
+          <div style="width:72px;height:72px;border-radius:50%;overflow:hidden;position:relative;flex:0 0 auto;box-shadow:0 8px 18px -10px rgba(40,28,20,.4)"><div style="{{ meSwatch }}"></div></div>
+          <div style="line-height:1.25"><div style="font-size:21px;font-weight:800;color:#1C1A19;letter-spacing:-.3px">Ava Sharma</div><div style="font-size:13px;font-weight:600;color:#A79E97">@avasharma</div></div>
+        </div>
+        <div style="display:flex;gap:10px;padding:0 22px 20px">
+          <div style="flex:1;background:#fff;border:1px solid #EFE7E0;border-radius:14px;padding:13px;text-align:center"><div style="font-size:18px;font-weight:800;color:#1C1A19">3</div><div style="font-size:11.5px;font-weight:600;color:#A79E97">Won lots</div></div>
+          <div style="flex:1;background:#fff;border:1px solid #EFE7E0;border-radius:14px;padding:13px;text-align:center"><div style="font-size:18px;font-weight:800;color:#1C1A19">38</div><div style="font-size:11.5px;font-weight:600;color:#A79E97">Orders</div></div>
+          <div style="flex:1;background:#fff;border:1px solid #EFE7E0;border-radius:14px;padding:13px;text-align:center"><div style="font-size:18px;font-weight:800;color:#1C1A19">64</div><div style="font-size:11.5px;font-weight:600;color:#A79E97">Saved</div></div>
+        </div>
+        <div style="padding:0 12px">
+          <sc-for list="{{ accountRows }}" as="row" hint-placeholder-count="6">
+            <div onClick="{{ row.open }}" style="display:flex;align-items:center;gap:14px;padding:14px 12px;cursor:pointer;border-bottom:1px solid #F1E9E2">
+              <span style="font-family:'Material Symbols Rounded';font-size:23px;color:#6B635D;width:26px;text-align:center">{{ row.icon }}</span>
+              <span style="flex:1;font-size:15px;font-weight:700;color:#1C1A19">{{ row.label }}</span>
+              <span style="font-family:'Material Symbols Rounded';font-size:22px;color:#C2B8B0">chevron_right</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:20px 22px">
+          <button onClick="{{ goSell }}" style="width:100%;background:#FF2D6F;border:none;color:#fff;border-radius:14px;padding:15px 0;font-family:'Hanken Grotesk';font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 10px 24px -8px rgba(255,45,111,.6)">Become a seller</button>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ CHECKOUT ============ -->
+      <sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Checkout" style="position:absolute;inset:0">
+        <div class="nx-hide-sb" style="position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:110px">
+          <div style="display:flex;align-items:center;gap:12px;padding:8px 18px 16px">
+            <button onClick="{{ backHome }}" style="width:38px;height:38px;border-radius:50%;background:#fff;border:1px solid #EFE7E0;display:flex;align-items:center;justify-content:center;color:#1C1A19;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:23px">chevron_left</span></button>
+            <span style="font-size:21px;font-weight:800;color:#1C1A19;letter-spacing:-.3px">Checkout</span>
+          </div>
+          <div style="padding:0 22px">
+            <sc-if value="{{ cart.won }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:9px;background:#EAF8F1;border:1px solid #BFE9D4;border-radius:14px;padding:11px 13px;margin-bottom:14px"><span style="font-family:'Material Symbols Rounded';font-size:20px;color:#15B37D;font-variation-settings:'FILL' 1">emoji_events</span><span style="font-size:13px;font-weight:700;color:#0E7A52">You won this lot at auction!</span></div>
+            </sc-if>
+            <div style="display:flex;align-items:center;gap:13px;background:#fff;border:1px solid #EFE7E0;border-radius:18px;padding:13px">
+              <div style="width:62px;height:62px;border-radius:14px;overflow:hidden;position:relative;flex:0 0 auto"><div style="{{ cart.sw }}"></div></div>
+              <div style="flex:1;line-height:1.3"><div style="font-size:14.5px;font-weight:700;color:#1C1A19">{{ cart.name }}</div><div style="font-size:12px;font-weight:600;color:#A79E97;margin-top:1px">{{ cart.seller }}</div></div>
+              <div style="font-size:16px;font-weight:800;color:#1C1A19">{{ cart.priceLabel }}</div>
+            </div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:.6px;color:#A79E97;margin:22px 0 9px">DELIVER TO</div>
+            <div style="display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #EFE7E0;border-radius:18px;padding:15px">
+              <span style="font-family:'Material Symbols Rounded';font-size:22px;color:#3A332E">location_on</span>
+              <div style="flex:1;line-height:1.4"><div style="font-size:14px;font-weight:700;color:#1C1A19">Ava Sharma</div><div style="font-size:12.5px;font-weight:500;color:#6B635D">214 Larkspur Lane, Apt 5<br>Brooklyn, NY 11215</div></div>
+              <span style="font-size:13px;font-weight:700;color:#FF2D6F">Change</span>
+            </div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:.6px;color:#A79E97;margin:18px 0 9px">PAYMENT</div>
+            <div style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #EFE7E0;border-radius:18px;padding:15px">
+              <span style="font-family:'Material Symbols Rounded';font-size:22px;color:#3A332E">credit_card</span>
+              <div style="flex:1;line-height:1.3"><div style="font-size:14px;font-weight:700;color:#1C1A19">Visa ···· 4242</div><div style="font-size:12px;font-weight:500;color:#A79E97">Expires 08/28</div></div>
+              <span style="font-size:13px;font-weight:700;color:#FF2D6F">Change</span>
+            </div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:.6px;color:#A79E97;margin:18px 0 9px">SUMMARY</div>
+            <div style="background:#fff;border:1px solid #EFE7E0;border-radius:18px;padding:16px">
+              <div style="display:flex;justify-content:space-between;font-size:14px;color:#6B635D;margin-bottom:10px"><span>Winning bid</span><span style="font-weight:700;color:#1C1A19">{{ cart.priceLabel }}</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:14px;color:#6B635D;margin-bottom:10px"><span>Insured shipping</span><span style="font-weight:700;color:#15B37D">Free</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:14px;color:#6B635D"><span>Buyer protection</span><span style="font-weight:700;color:#1C1A19">Included</span></div>
+              <div style="height:1px;background:#EFE7E0;margin:13px 0"></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;font-weight:800;color:#1C1A19">Total</span><span style="font-size:22px;font-weight:800;color:#1C1A19;letter-spacing:-.4px">{{ cart.totalLabel }}</span></div>
+            </div>
+          </div>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:14px;padding:12px 18px 22px;background:rgba(251,248,245,.92);backdrop-filter:blur(12px);border-top:1px solid #EFE7E0">
+          <div style="line-height:1.1"><div style="font-size:11px;font-weight:700;color:#A79E97">Total</div><div style="font-size:20px;font-weight:800;color:#1C1A19">{{ cart.totalLabel }}</div></div>
+          <button onClick="{{ placeOrder }}" style="flex:1;background:#FF2D6F;border:none;color:#fff;border-radius:14px;padding:15px 0;font-family:'Hanken Grotesk';font-size:15.5px;font-weight:800;cursor:pointer;box-shadow:0 10px 24px -8px rgba(255,45,111,.6)">Place order</button>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ CONFIRM ============ -->
+      <sc-if value="{{ isConfirm }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Order confirmed" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 30px;text-align:center">
+        <div style="width:96px;height:96px;border-radius:50%;background:#EAF8F1;display:flex;align-items:center;justify-content:center;animation:soldIn .5s cubic-bezier(.2,.9,.3,1.2)"><span style="font-family:'Material Symbols Rounded';font-size:58px;color:#15B37D;font-variation-settings:'FILL' 1">check_circle</span></div>
+        <div style="font-size:25px;font-weight:800;color:#1C1A19;letter-spacing:-.4px;margin-top:22px">Order confirmed</div>
+        <div style="font-size:14px;font-weight:500;color:#6B635D;margin-top:8px;line-height:1.5">Your piece is on its way. We've emailed your receipt and tracking details.</div>
+        <div style="display:flex;align-items:center;gap:13px;background:#fff;border:1px solid #EFE7E0;border-radius:18px;padding:13px;margin-top:26px;width:100%;text-align:left">
+          <div style="width:54px;height:54px;border-radius:12px;overflow:hidden;position:relative;flex:0 0 auto"><div style="{{ cart.sw }}"></div></div>
+          <div style="flex:1;line-height:1.3"><div style="font-size:14px;font-weight:700;color:#1C1A19">{{ cart.name }}</div><div style="font-size:12px;font-weight:600;color:#A79E97">Order #NSH-2271 · {{ cart.totalLabel }}</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;color:#15B37D;margin-top:16px"><span style="font-family:'Material Symbols Rounded';font-size:20px">local_shipping</span><span style="font-size:13.5px;font-weight:700">Arriving Mon, Jul 6</span></div>
+        <button onClick="{{ backHome }}" style="width:100%;background:#1C1A19;border:none;color:#fff;border-radius:14px;padding:15px 0;font-family:'Hanken Grotesk';font-size:15px;font-weight:800;margin-top:30px;cursor:pointer">Back to auction</button>
+        <button onClick="{{ goActivity }}" style="background:none;border:none;color:#6B635D;font-family:'Hanken Grotesk';font-size:14px;font-weight:700;margin-top:14px;cursor:pointer">View in Activity</button>
+      </div>
+      </sc-if>
+
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+    <div style="position:relative;z-index:20;flex:0 0 auto;display:flex;align-items:flex-end;padding:8px 10px 26px;background:rgba(251,248,245,.94);backdrop-filter:blur(14px);border-top:1px solid #EFE7E0">
+      <button onClick="{{ goHome }}" style="flex:1;background:none;border:none;cursor:pointer;padding:4px 0">
+        <span style="{{ tHome }}"><span style="display:block;text-align:center;font-family:'Material Symbols Rounded';font-size:25px;line-height:1;font-variation-settings:'FILL' 1">home</span><span style="display:block;text-align:center;font-size:10px;font-weight:700;margin-top:3px">Home</span></span>
+      </button>
+      <button onClick="{{ goBrowse }}" style="flex:1;background:none;border:none;cursor:pointer;padding:4px 0">
+        <span style="{{ tCats }}"><span style="display:block;text-align:center;font-family:'Material Symbols Rounded';font-size:25px;line-height:1">search</span><span style="display:block;text-align:center;font-size:10px;font-weight:700;margin-top:3px">Shop</span></span>
+      </button>
+      <button onClick="{{ goSell }}" style="flex:1;background:none;border:none;cursor:pointer;padding:0 0 4px;display:flex;flex-direction:column;align-items:center">
+        <span style="width:50px;height:50px;border-radius:50%;background:#FF2D6F;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px -8px rgba(255,45,111,.7);margin-top:-18px"><span style="font-family:'Material Symbols Rounded';font-size:28px;color:#fff">add</span></span>
+        <span style="font-size:10px;font-weight:800;color:#FF2D6F;margin-top:4px">Sell</span>
+      </button>
+      <button onClick="{{ goActivity }}" style="flex:1;background:none;border:none;cursor:pointer;padding:4px 0">
+        <span style="{{ tAct }}"><span style="display:block;text-align:center;font-family:'Material Symbols Rounded';font-size:25px;line-height:1">favorite</span><span style="display:block;text-align:center;font-size:10px;font-weight:700;margin-top:3px">Activity</span></span>
+      </button>
+      <button onClick="{{ goAccount }}" style="flex:1;background:none;border:none;cursor:pointer;padding:4px 0">
+        <span style="{{ tAcct }}"><span style="display:block;text-align:center;font-family:'Material Symbols Rounded';font-size:25px;line-height:1">account_circle</span><span style="display:block;text-align:center;font-size:10px;font-weight:700;margin-top:3px">Account</span></span>
+      </button>
+    </div>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;liveCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Live auction&quot;},&quot;bidPace&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Calm&quot;,&quot;Lively&quot;,&quot;Frenzy&quot;],&quot;default&quot;:&quot;Lively&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Live auction&quot;}}">
+class Component extends DCLogic {
+  grads = {
+    silver:'linear-gradient(140deg,#F4F6F8 0%,#D2D7DD 40%,#A7AEB6 72%,#7E858E 100%)',
+    darksilver:'linear-gradient(140deg,#C9CDD2 0%,#9199A1 38%,#5E666E 72%,#3A4046 100%)',
+    pearl:'linear-gradient(140deg,#FCFBF8 0%,#ECE5DA 40%,#D8CEBE 72%,#BFB4A1 100%)',
+    amethyst:'linear-gradient(140deg,#E7D9FB 0%,#A877E6 38%,#7B45C2 70%,#46216E 100%)',
+    sapphire:'linear-gradient(140deg,#D3E0FA 0%,#5C84E6 38%,#2A57C2 70%,#13306E 100%)',
+    emerald:'linear-gradient(140deg,#CDEFDB 0%,#4FC58C 38%,#159C66 70%,#0B6342 100%)',
+    ruby:'linear-gradient(140deg,#FAD2DC 0%,#E8567E 38%,#C71E50 70%,#7E0E2F 100%)',
+    gold:'linear-gradient(140deg,#F8ECC2 0%,#E7C766 38%,#B8901F 70%,#8A6A12 100%)'
+  };
+  tints = {silver:'#AEB4BB',darksilver:'#6E767E',pearl:'#C9BBA6',amethyst:'#7B45C2',sapphire:'#2A57C2',emerald:'#159C66',ruby:'#C71E50',gold:'#C9A227'};
+
+  // Auction lots (silver jewellery). start = opening bid, value = typical settle
+  lots = [
+    {name:'Sterling Silver Signet Ring',mat:'silver',start:5,value:120,metal:'925 Sterling',stone:'Black Onyx',size:'US 9'},
+    {name:'Moonstone Halo Pendant',mat:'pearl',start:10,value:185,metal:'925 Sterling',stone:'Rainbow Moonstone',size:'18 in'},
+    {name:'Amethyst Drop Earrings',mat:'amethyst',start:8,value:95,metal:'925 Sterling',stone:'Brazilian Amethyst',size:'32 mm'},
+    {name:'Oxidised Silver Cuff',mat:'darksilver',start:12,value:160,metal:'925 Sterling',stone:'—',size:'Adjustable'},
+    {name:'Blue Topaz Cocktail Ring',mat:'sapphire',start:10,value:210,metal:'925 Sterling',stone:'Sky Blue Topaz',size:'US 7'},
+    {name:'Garnet Charm Necklace',mat:'ruby',start:6,value:130,metal:'925 Sterling',stone:'Mozambique Garnet',size:'16 in'}
+  ];
+  // Shop listings (buy-now)
+  pool = [
+    {id:'p1',name:'Sterling Silver Signet Ring',mat:'silver',metal:'925 Sterling',stone:'Black Onyx',size:'US 9',price:135},
+    {id:'p2',name:'Moonstone Halo Pendant',mat:'pearl',metal:'925 Sterling',stone:'Rainbow Moonstone',size:'18 in',price:210},
+    {id:'p3',name:'Amethyst Drop Earrings',mat:'amethyst',metal:'925 Sterling',stone:'Brazilian Amethyst',size:'32 mm',price:110},
+    {id:'p4',name:'Oxidised Silver Cuff',mat:'darksilver',metal:'925 Sterling',stone:'—',size:'Adjustable',price:175},
+    {id:'p5',name:'Blue Topaz Cocktail Ring',mat:'sapphire',metal:'925 Sterling',stone:'Sky Blue Topaz',size:'US 7',price:240},
+    {id:'p6',name:'Garnet Charm Necklace',mat:'ruby',metal:'925 Sterling',stone:'Mozambique Garnet',size:'16 in',price:150}
+  ];
+  cats = [
+    {name:'Rings',mat:'silver',count:'240 items'},
+    {name:'Necklaces',mat:'pearl',count:'180 items'},
+    {name:'Earrings',mat:'amethyst',count:'160 items'},
+    {name:'Bracelets',mat:'darksilver',count:'120 items'},
+    {name:'Gemstone',mat:'sapphire',count:'210 items'},
+    {name:'Oxidised',mat:'darksilver',count:'90 items'},
+    {name:'Charms',mat:'ruby',count:'70 items'},
+    {name:'Under $50',mat:'emerald',count:'140 items'}
+  ];
+  users = [
+    {n:'silverfox_ny',c:'#C7CDD4',mat:'silver'},
+    {n:'mira.jewels',c:'#C7A6F2',mat:'amethyst'},
+    {n:'the_curator',c:'#9FC0FF',mat:'sapphire',mod:true},
+    {n:'oxide_ollie',c:'#AAB0B7',mat:'darksilver'},
+    {n:'pearl.diver',c:'#EAD9C2',mat:'pearl'},
+    {n:'garnet_gal',c:'#F39AB0',mat:'ruby'},
+    {n:'stackqueen',c:'#B8BEC5',mat:'silver'},
+    {n:'noor.j',c:'#8FD6B0',mat:'emerald'}
+  ];
+  msgs = ['this is gorgeous','what size is the ring?','925 stamped?','shipping to Canada?','love the oxidised finish','first auction, so fun','the moonstone flash!','need this in my life','how heavy is it?','stack goals','can you show the hallmark?','obsessed'];
+
+  state = {
+    screen:'home', detail:null, cart:null, followed:false,
+    lotIdx:0, bid:5, bidCount:0, bidder:'Opening bid', bidderColor:'#FFFFFF',
+    youWin:false, timeLeft:15, viewers:1284, ended:false, won:false,
+    chat:[], showNotes:false, bidPulse:0,
+    sellForm:{shop:'',cat:'Jewellery',about:'',freq:'Weekly',contact:''}, sellDone:false
+  };
+  cid = 0;
+
+  swatch(m){
+    return {position:'absolute',inset:0,
+      background:'radial-gradient(130% 90% at 28% 16%, rgba(255,255,255,.62), rgba(255,255,255,0) 55%), '+this.grads[m],
+      boxShadow:'inset 0 1px 1px rgba(255,255,255,.55), inset 0 -22px 34px rgba(0,0,0,.20)'};
+  }
+  liveBg(m){
+    const t = this.tints[m];
+    return {position:'absolute',inset:0,
+      background:'radial-gradient(78% 52% at 50% 22%, '+t+'55, rgba(0,0,0,0) 62%), radial-gradient(120% 90% at 50% 120%, '+t+'22, transparent 58%), linear-gradient(165deg,#2A2724,#100D0B)'};
+  }
+  heroBgStyle(m){
+    const t = this.tints[m];
+    return {position:'absolute',inset:0,
+      background:'radial-gradient(80% 55% at 50% 30%, '+t+'66, rgba(0,0,0,0) 64%), linear-gradient(165deg,#2A2724,#0E0B0A)'};
+  }
+  fmt(n){ return '$'+Math.round(n).toLocaleString('en-US'); }
+  vk(n){ return n>=1000 ? (n/1000).toFixed(1)+'k' : (''+n); }
+  inc(bid){ return bid<50?5 : bid<150?10 : bid<400?20 : 50; }
+  nextBidAmt(){ const s=this.state; return s.bidCount===0 ? this.lots[s.lotIdx].start : s.bid + this.inc(s.bid); }
+
+  pace(){
+    const p = this.props.bidPace || 'Lively';
+    return ({Calm:{chat:2600,bid:3200},Lively:{chat:1800,bid:1900},Frenzy:{chat:1100,bid:1100}})[p] || {chat:1800,bid:1900};
+  }
+  startTimers(){
+    this.stopTimers();
+    const c = this.pace();
+    this.tA = setInterval(()=>this.addChat(), c.chat);
+    this.tC = setInterval(()=>this.rivalBid(), c.bid);
+    this.tB = setInterval(()=>this.tick(), 1000);
+  }
+  stopTimers(){ [this.tA,this.tB,this.tC].forEach(t=>t&&clearInterval(t)); }
+  componentDidMount(){ for(let i=0;i<5;i++) this.addChat(); this.startTimers(); this.startFeed(); }
+  componentDidUpdate(prev){ if(prev && prev.props && prev.props.bidPace !== this.props.bidPace) this.startTimers(); }
+  componentWillUnmount(){ this.stopTimers(); if(this._raf) cancelAnimationFrame(this._raf); }
+
+  feedRef(el){ this.feedCanvas = el; this.feedCtx = el ? el.getContext('2d') : null; }
+  startFeed(){ if(this._raf) return; const loop=(now)=>{ this.drawFeed(now); this._raf=requestAnimationFrame(loop); }; this._raf=requestAnimationFrame(loop); }
+  drawFeed(now){
+    const x = this.feedCtx; if(!x || this.state.screen!=='live') return;
+    const W=480,H=980,t=now/1000;
+    const bx=W/2+Math.sin(t*0.4)*36, by=H*0.4+Math.cos(t*0.3)*22;
+    let g=x.createRadialGradient(bx,by,30,W/2,H/2,H*0.72);
+    g.addColorStop(0,'#3C3831');g.addColorStop(.5,'#211E1B');g.addColorStop(1,'#0D0A09');
+    x.fillStyle=g;x.fillRect(0,0,W,H);
+    for(let i=0;i<16;i++){const seed=i*137.5;const px=(Math.sin(seed)*0.5+0.5)*W;const py=H-(((t*44+i*80)%(H+140)));const r=7+(i%4)*8;const a=0.04+0.05*Math.sin(t*2+i);x.fillStyle='rgba(255,226,170,'+a.toFixed(3)+')';x.beginPath();x.arc(px,py,r,0,7);x.fill();}
+    x.save();x.translate(W/2,H*0.42);const rot=t*0.6;
+    x.save();x.rotate(Math.sin(t*0.5)*0.14);x.scale(1,0.62);
+    const R=150;
+    const bg=x.createLinearGradient(-R,-R,R,R);bg.addColorStop(0,'#F4F6F8');bg.addColorStop(.4,'#C6CBD1');bg.addColorStop(.7,'#8B929A');bg.addColorStop(1,'#EDEFF2');
+    x.lineWidth=30;x.strokeStyle=bg;x.beginPath();x.arc(0,0,R,0,7);x.stroke();
+    const sa=rot%(Math.PI*2);x.strokeStyle='rgba(255,255,255,0.8)';x.lineWidth=30;x.beginPath();x.arc(0,0,R,sa,sa+0.45);x.stroke();
+    x.restore();
+    x.save();x.translate(0,-R*0.62-4);x.rotate(rot);const gs=46,f=8;
+    for(let k=0;k<f;k++){const a0=k/f*Math.PI*2,a1=(k+1)/f*Math.PI*2;const sh=0.5+0.5*Math.sin(rot*2+k);x.fillStyle='rgba('+(198+Math.round(45*sh))+','+(224+Math.round(22*sh))+',255,1)';x.beginPath();x.moveTo(0,0);x.lineTo(Math.cos(a0)*gs,Math.sin(a0)*gs);x.lineTo(Math.cos(a1)*gs,Math.sin(a1)*gs);x.closePath();x.fill();}
+    x.fillStyle='rgba(255,255,255,0.9)';x.beginPath();x.arc(-gs*0.25,-gs*0.28,gs*0.16,0,7);x.fill();
+    x.restore();x.restore();
+    let vg=x.createRadialGradient(W/2,H*0.45,H*0.24,W/2,H*0.5,H*0.78);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,0.58)');x.fillStyle=vg;x.fillRect(0,0,W,H);
+  }
+
+  addChat(kind, who, txt){
+    const u = who || this.users[Math.floor(Math.random()*this.users.length)];
+    let type = kind;
+    if(!type){ const r=Math.random(); type = r<0.16?'joined' : 'msg'; }
+    const item = {id:++this.cid, user:u.n, color:u.c, av:this.swatch(u.mat), mod:(type==='msg'&&!!u.mod), type};
+    item.text = txt || (type==='joined' ? 'joined' : this.msgs[Math.floor(Math.random()*this.msgs.length)]);
+    this.setState(s=>({chat:[item, ...s.chat].slice(0,14)}));
+  }
+  say(){
+    const item = {id:++this.cid, user:'you', color:'#FF9CC0', av:this.swatch('pearl'), mod:false, type:'msg', text:this.msgs[Math.floor(Math.random()*this.msgs.length)]};
+    this.setState(s=>({chat:[item, ...s.chat].slice(0,14)}));
+  }
+
+  tick(){
+    const s = this.state;
+    if(s.screen!=='live' || s.ended) return;
+    let v = s.viewers + Math.round((Math.random()-0.42)*10); if(v<80) v=80;
+    let t = s.timeLeft - 1;
+    if(t<=0){
+      const won = s.bidder==='you';
+      this.setState({ended:true, timeLeft:0, won, viewers:v});
+      this.addChat('msg', this.users[2], won ? 'sold to you — congrats! 🎉' : 'sold! next lot coming up');
+      if(!won) setTimeout(()=>this.nextLot(), 2600);
+      return;
+    }
+    this.setState({timeLeft:t, viewers:v});
+  }
+  rivalBid(){
+    const s = this.state;
+    if(s.screen!=='live' || s.ended) return;
+    const lot = this.lots[s.lotIdx];
+    if(s.bid >= lot.value) return;               // settled near market value
+    const p = this.props.bidPace || 'Lively';
+    const th = p==='Frenzy'?0.82 : p==='Calm'?0.5 : 0.68;
+    if(Math.random() > th) return;
+    const amt = this.nextBidAmt();
+    if(amt > lot.value*1.08) return;
+    const u = this.users[Math.floor(Math.random()*this.users.length)];
+    if(u.n===s.bidder) return;
+    this.setState(x=>({bid:amt, bidCount:x.bidCount+1, bidder:u.n, bidderColor:u.c, youWin:false,
+      timeLeft: x.timeLeft<6?8:x.timeLeft, bidPulse:x.bidPulse+1}));
+    this.addChat('msg', u, 'bid '+this.fmt(amt));
+  }
+  placeBidAmt(amt){
+    const s = this.state;
+    if(s.screen!=='live' || s.ended) return;
+    this.setState(x=>({bid:amt, bidCount:x.bidCount+1, bidder:'you', bidderColor:'#FF9CC0', youWin:true,
+      timeLeft: x.timeLeft<6?8:x.timeLeft, bidPulse:x.bidPulse+1}));
+    this.addChat('msg', {n:'you',c:'#FF9CC0',mat:'pearl'}, 'bid '+this.fmt(amt));
+  }
+  nextLot(){
+    this.setState(s=>{
+      const i = (s.lotIdx+1)%this.lots.length;
+      const lot = this.lots[i];
+      return {lotIdx:i, bid:lot.start, bidCount:0, bidder:'Opening bid', bidderColor:'#FFFFFF',
+        youWin:false, timeLeft:15, ended:false, won:false};
+    });
+  }
+  payWin(){
+    const lot = this.lots[this.state.lotIdx];
+    this.go('checkout', {name:lot.name, mat:lot.mat, price:this.state.bid, seller:'@nishusilver', won:true});
+  }
+  setSell(k,v){ this.setState(s=>({sellForm:{...s.sellForm,[k]:v}})); }
+  submitSell(){ const f=this.state.sellForm; if(f.shop.trim() && f.contact.trim()) this.setState({sellDone:true}); }
+  resetSell(){ this.setState({sellDone:false, sellForm:{shop:'',cat:'Jewellery',about:'',freq:'Weekly',contact:''}}); }
+
+  go(screen, item){
+    this.setState(s=>{
+      const st = {screen};
+      if(screen==='detail') st.detail = item || s.detail;
+      if(screen==='checkout') st.cart = item || s.cart || s.detail || this.pool[0];
+      if(screen==='live'){
+        const lot = this.lots[0];
+        st.lotIdx=0; st.bid=lot.start; st.bidCount=0; st.bidder='Opening bid'; st.bidderColor='#FFFFFF';
+        st.youWin=false; st.timeLeft=15; st.ended=false; st.won=false; st.showNotes=false; st.viewers=1284;
+      }
+      return st;
+    });
+  }
+
+  renderVals(){
+    const s = this.state;
+    const sw = m => this.swatch(m);
+    const lot = this.lots[s.lotIdx];
+    const tl = s.timeLeft;
+    const nb = this.nextBidAmt();
+    const i2 = this.inc(nb);
+    const mkShop = p => ({...p, sw:sw(p.mat), priceLabel:this.fmt(p.price), open:()=>this.go('detail',p)});
+
+    const d = s.detail || this.pool[0];
+    const detail = {...d, sw:sw(d.mat), priceLabel:this.fmt(d.price), buy:()=>this.go('checkout', {...d, seller:'@nishusilver'})};
+
+    const c = s.cart || s.detail || this.pool[0];
+    const cart = {...c, sw:sw(c.mat), priceLabel:this.fmt(c.price), totalLabel:this.fmt(c.price), won:!!c.won};
+
+    // auction display
+    const isOpening = s.bidCount===0;
+    const chipAmts = [nb, nb+i2, nb+i2*3];
+    const chipStyleBase = {flex:'1',background:'rgba(255,255,255,.12)',border:'1px solid rgba(255,255,255,.2)',color:'#fff',borderRadius:'11px',padding:'9px 0',fontFamily:"'Hanken Grotesk'",fontSize:'13.5px',fontWeight:'800',cursor:'pointer'};
+    const chips = chipAmts.map((a,idx)=>({label:this.fmt(a), act:()=>this.placeBidAmt(a),
+      style: idx===0 ? {...chipStyleBase, background:'rgba(255,45,111,.22)', border:'1px solid rgba(255,45,111,.5)'} : chipStyleBase}));
+
+    const statusText = s.ended ? '' : (tl<=3 ? 'Going twice…' : tl<=6 ? 'Going once…' : '');
+    const statusColor = tl<=3 ? '#FF6B6B' : '#FFC24A';
+
+    const lineup = this.lots.map((l,idx)=>({name:l.name, sw:sw(l.mat), no:idx+1, isLiveNow:idx===s.lotIdx, startLabel:'Starts '+this.fmt(l.start)}));
+
+    const activity = [
+      {icon:'gavel',bg:'#FFE7EF',fg:'#FF2D6F',title:'You were outbid',sub:'Blue Topaz Cocktail Ring · now $85',time:'2m',open:()=>this.go('live')},
+      {icon:'emoji_events',bg:'#FBF6E3',fg:'#C9A227',title:'You won a lot!',sub:'Amethyst Drop Earrings · $72',time:'1h',open:()=>this.go('checkout', {name:'Amethyst Drop Earrings',mat:'amethyst',price:72,seller:'@nishusilver',won:true})},
+      {icon:'local_shipping',bg:'#EAF8F1',fg:'#15B37D',title:'Your order shipped',sub:'Sterling Silver Signet Ring · #NSH-2271',time:'6h',open:()=>this.go('account')},
+      {icon:'sell',bg:'#F2F4F6',fg:'#7E858E',title:'Price drop on a saved item',sub:'Oxidised Silver Cuff · now $175',time:'1d',open:()=>this.go('detail', this.pool[3])},
+      {icon:'favorite',bg:'#FFE7EF',fg:'#FF2D6F',title:'nishusilver added 12 new lots',sub:'Silver Auction Night lineup',time:'1d',open:()=>this.go('seller')}
+    ];
+    const accountRows = [
+      {icon:'emoji_events',label:'My won lots',open:()=>this.go('activity')},
+      {icon:'receipt_long',label:'My orders',open:()=>this.go('activity')},
+      {icon:'bookmark',label:'Saved items',open:()=>this.go('categories')},
+      {icon:'credit_card',label:'Payment methods',open:()=>{}},
+      {icon:'location_on',label:'Addresses',open:()=>{}},
+      {icon:'settings',label:'Settings',open:()=>{}},
+      {icon:'help',label:'Help & support',open:()=>{}}
+    ];
+    const rail = [      {icon:'more_horiz',label:'More',act:()=>{}},
+      {icon:'ios_share',label:'Share',act:()=>{}},
+      {icon:'flag',label:'Report',act:()=>{}},
+      {icon:'storefront',label:'Shop',act:()=>this.go('seller')}
+    ];
+
+    return {
+      screen:s.screen,
+      isHome:s.screen==='home', isLive:s.screen==='live', isDetail:s.screen==='detail',
+      isSeller:s.screen==='seller', isCheckout:s.screen==='checkout', isConfirm:s.screen==='confirm',
+      isCategories:s.screen==='categories', isSell:s.screen==='sell', isActivity:s.screen==='activity', isAccount:s.screen==='account',
+      showNav:['home','categories','sell','activity','account','seller'].includes(s.screen),
+      statusStyle:{color:s.screen==='live'?'#fff':'#1C1A19'},
+      tHome:{color:s.screen==='home'?'#FF2D6F':'#B3ABA4'},
+      tCats:{color:s.screen==='categories'?'#FF2D6F':'#B3ABA4'},
+      tAct:{color:s.screen==='activity'?'#FF2D6F':'#B3ABA4'},
+      tAcct:{color:(s.screen==='account'||s.screen==='seller')?'#FF2D6F':'#B3ABA4'},
+
+      goHome:()=>this.go('home'), goBrowse:()=>this.go('categories'),
+      goSell:()=>this.go('sell'), goActivity:()=>this.go('activity'), goAccount:()=>this.go('account'),
+      backHome:()=>this.go('home'), enterLive:()=>this.go('live'), visitShop:()=>this.go('seller'),
+      feedRef:(el)=>this.feedRef(el),
+
+      // shared visuals
+      sellerSwatch:sw('silver'), meSwatch:sw('amethyst'),
+      heroBg:this.heroBgStyle('silver'), heroLotSwatch:sw(lot.mat), heroLotName:lot.name,
+      liveBg:this.liveBg('silver'), lotSwatch:sw(lot.mat),
+      viewersLabel:this.vk(s.viewers),
+
+      lineup, lotsCountLabel:this.lots.length+' lots tonight',
+      shopItems:this.pool.map(mkShop),
+      cats:this.cats.map(ct=>({...ct, sw:sw(ct.mat), open:()=>this.go('detail', this.pool.find(p=>p.mat===ct.mat) || this.pool[0])})),
+      activity, accountRows, rail,
+      detail, cart,
+
+      // follow
+      followed:s.followed,
+      toggleFollow:()=>this.setState(x=>({followed:!x.followed})),
+      followLabel:s.followed?'Following':'Follow',
+      followStyle:Object.assign({padding:'9px 22px',borderRadius:'999px',fontFamily:"'Hanken Grotesk'",fontSize:'13.5px',fontWeight:800,cursor:'pointer',marginBottom:'2px'},
+        s.followed ? {background:'#fff',color:'#1C1A19',border:'1.5px solid #E0D7CF'} : {background:'#FF2D6F',color:'#fff',border:'1.5px solid #FF2D6F'}),
+      liveFollowLabel:s.followed?'Following':'Follow',
+      liveFollowStyle:Object.assign({marginLeft:'4px',padding:'6px 15px',borderRadius:'999px',fontFamily:"'Hanken Grotesk'",fontSize:'12.5px',fontWeight:800,cursor:'pointer'},
+        s.followed ? {background:'rgba(255,255,255,.22)',color:'#fff',border:'1px solid rgba(255,255,255,.5)'} : {background:'#FF2D6F',color:'#fff',border:'1px solid #FF2D6F'}),
+
+      // live chat
+      showChat:(this.props.liveCaptions ?? true),
+      showNotes:s.showNotes, toggleNotes:()=>this.setState(x=>({showNotes:!x.showNotes})),
+      chat:s.chat.map(m=>({...m, isMod:m.mod, userStyle:{color:m.color,fontWeight:700},
+        textStyle:{marginLeft:'6px', ...(/^bid /.test(m.text)?{color:'#8FE3B4',fontWeight:800}:m.type==='joined'?{color:'rgba(255,255,255,.55)',fontWeight:600}:{color:'#fff',fontWeight:500})}})),
+      say:()=>this.say(),
+
+      // auction panel
+      lotName:lot.name, lotNoLabel:'Lot '+(s.lotIdx+1)+' of '+this.lots.length,
+      bidCountLabel:(s.bidCount)+(s.bidCount===1?' bid':' bids'),
+      bidTopLabel:isOpening?'STARTING BID':'CURRENT BID',
+      bidLabel:this.fmt(s.bid),
+      bidNumStyle:{color:'#fff',fontSize:'27px',fontWeight:'800',letterSpacing:'-.6px',marginTop:'1px',animation:'bidPop .4s ease',key:s.bidPulse},
+      bidderLabel:isOpening?'No bids yet':(s.youWin?"You're top bid":s.bidder),
+      bidderIcon:s.youWin?'star':(isOpening?'gavel':'person'),
+      bidderChipStyle:{display:'inline-flex',alignItems:'center',gap:'4px',fontSize:'11.5px',fontWeight:'700',padding:'4px 9px',borderRadius:'999px',
+        ...(s.youWin?{background:'rgba(143,227,180,.18)',color:'#8FE3B4'}:{background:'rgba(255,255,255,.12)',color:'rgba(255,255,255,.82)'})},
+      timerBoxStyle:{display:'inline-flex',alignItems:'center',gap:'5px',padding:'6px 11px',borderRadius:'11px',fontWeight:'800',
+        ...(tl<=6?{background:'rgba(245,51,63,.22)',color:'#FF7A7A',border:'1px solid rgba(245,51,63,.5)'}:{background:'rgba(255,255,255,.1)',color:'#fff',border:'1px solid rgba(255,255,255,.16)'})},
+      timeLabel:'0:'+String(Math.max(tl,0)).padStart(2,'0'),
+      statusText, statusStyleLive:{marginTop:'10px',fontSize:'12px',fontWeight:'800',letterSpacing:'.5px',color:statusColor},
+      chips,
+      placeBid:()=>this.placeBidAmt(nb),
+      placeLabel:s.youWin?("You're winning · re-bid "+this.fmt(nb)):('Place bid · '+this.fmt(nb)),
+      placeIcon:'gavel',
+      placeStyle:Object.assign({width:'100%',marginTop:'11px',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',border:'none',borderRadius:'14px',padding:'14px 0',fontFamily:"'Hanken Grotesk'",fontSize:'15.5px',fontWeight:'800',cursor:'pointer'},
+        s.youWin ? {background:'rgba(143,227,180,.18)',color:'#8FE3B4',border:'1px solid rgba(143,227,180,.4)'} : {background:'#FF2D6F',color:'#fff',boxShadow:'0 10px 24px -8px rgba(255,45,111,.7)'}),
+
+      // ended overlay
+      ended:s.ended, won:s.won,
+      soldBadge:s.won?'YOU WON!':'SOLD',
+      soldBadgeStyle:Object.assign({display:'inline-block',fontSize:'32px',fontWeight:'800',letterSpacing:'2px',padding:'14px 32px',borderRadius:'18px'},
+        s.won?{background:'#15B37D',color:'#fff',boxShadow:'0 18px 40px -10px rgba(21,179,125,.6)'}:{background:'#F5333F',color:'#fff',boxShadow:'0 18px 40px -10px rgba(245,51,63,.6)'}),
+      soldLine:s.won?(lot.name+' is yours for '+this.fmt(s.bid)):(lot.name+' sold to '+(s.bidder==='Opening bid'?'the house':s.bidder)+' · '+this.fmt(s.bid)),
+      payWin:()=>this.payWin(), nextLotBtn:()=>this.nextLot(),
+
+      sellForm:s.sellForm, sellDone:s.sellDone, sellFormOpen:!s.sellDone,
+      sellName:(s.sellForm.shop.trim()||'there'), sellContact:(s.sellForm.contact.trim()||'your inbox'),
+      onSellShop:(e)=>this.setSell('shop', e.target.value),
+      onSellAbout:(e)=>this.setSell('about', e.target.value),
+      onSellContact:(e)=>this.setSell('contact', e.target.value),
+      sellCats:['Jewellery','Sarees','Kurtis','Accessories','Other'].map(o=>({label:o, act:()=>this.setSell('cat',o),
+        style:Object.assign({padding:'9px 15px',borderRadius:'999px',fontFamily:"'Hanken Grotesk'",fontSize:'13px',fontWeight:'700',cursor:'pointer'},
+          s.sellForm.cat===o?{background:'#1C1A19',color:'#fff',border:'1.5px solid #1C1A19'}:{background:'#fff',color:'#3A332E',border:'1.5px solid #EFE7E0'})})),
+      sellFreqs:['Daily','Weekly','Monthly'].map(o=>({label:o, act:()=>this.setSell('freq',o),
+        style:Object.assign({flex:'1',textAlign:'center',padding:'11px 0',borderRadius:'12px',fontFamily:"'Hanken Grotesk'",fontSize:'13.5px',fontWeight:'700',cursor:'pointer'},
+          s.sellForm.freq===o?{background:'#1C1A19',color:'#fff',border:'1.5px solid #1C1A19'}:{background:'#fff',color:'#3A332E',border:'1.5px solid #EFE7E0'})})),
+      submitSell:()=>this.submitSell(), resetSell:()=>this.resetSell(),
+      submitStyle:Object.assign({width:'100%',marginTop:'24px',border:'none',borderRadius:'14px',padding:'15px 0',fontFamily:"'Hanken Grotesk'",fontSize:'15.5px',fontWeight:'800',cursor:'pointer'},
+        (s.sellForm.shop.trim()&&s.sellForm.contact.trim())?{background:'#FF2D6F',color:'#fff',boxShadow:'0 12px 26px -8px rgba(255,45,111,.6)'}:{background:'#F0E8E1',color:'#B3A99F'}),
+
+      placeOrder:()=>this.go('confirm')
+    };
+  }
+}
+</script>
+</body>
+</html>

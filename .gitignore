@@ -1,0 +1,20 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+dist-ssr/
+
+# env — keep secrets out of git (Vercel reads these from its dashboard)
+.env
+.env.local
+.env.*.local
+
+# server data (sqlite, generated keys) — none in serverless mode, kept for self-hosted
+server/data/
+
+# editor / OS
+.DS_Store
+.vscode/
+*.log
+npm-debug.log*
