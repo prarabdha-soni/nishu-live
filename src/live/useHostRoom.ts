@@ -202,6 +202,15 @@ export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled
     return () => clearInterval(t);
   }, [enabled, channelReady, broadcast]);
 
+  // auto-pause the moment a lot ends — the seller must tap Resume to run the next one
+  const prevStatusRef = useRef(room.state.status);
+  useEffect(() => {
+    const prev = prevStatusRef.current;
+    const cur = room.state.status;
+    prevStatusRef.current = cur;
+    if (bidding && prev === 'open' && cur !== 'open') setBidding(false);
+  }, [room.state.status, bidding]);
+
   /* ---- controls ---- */
 
   const goLive = useCallback((stream: MediaStream) => {
@@ -217,7 +226,11 @@ export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled
     peersRef.current.clear();
   }, []);
 
-  const startBidding = useCallback(() => setBidding(true), []);
+  const startBidding = useCallback(() => {
+    // if the current lot already sold, advance to the next one before resuming
+    if (roomRef.current.state.status !== 'open') roomRef.current.continueToNext();
+    setBidding(true);
+  }, []);
   const pauseBidding = useCallback(() => setBidding(false), []);
 
   return {

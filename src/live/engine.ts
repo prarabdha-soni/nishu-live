@@ -125,7 +125,7 @@ export function roomReducer(state: RoomState, action: RoomAction): RoomState {
         userId: action.by.isYou ? 'you' : action.by.handle,
         handle: action.by.handle,
         color: action.by.color,
-        text: `bid $${action.amount.toLocaleString('en-US')}`,
+        text: `bid ₹${action.amount.toLocaleString('en-IN')}`,
         type: 'bid',
         isHost: action.by.isHost,
         ts: Date.now(),

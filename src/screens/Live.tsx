@@ -258,7 +258,7 @@ export function Live() {
                 </button>
               </>
             ) : (
-              <div className="sold-next">Next lot coming up…</div>
+              <div className="sold-next">Waiting for the next lot…</div>
             )}
           </div>
         </div>

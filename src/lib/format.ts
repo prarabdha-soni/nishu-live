@@ -1,10 +1,10 @@
-export function money(n: number): string {
-  return '$' + n.toLocaleString('en-US');
-}
-
 export function rupees(n: number): string {
   return '₹' + n.toLocaleString('en-IN');
 }
+
+// The whole app prices in rupees; money() is kept as an alias used across the
+// auction/checkout screens.
+export const money = rupees;
 
 export function clock(seconds: number): string {
   const s = Math.max(0, seconds);

@@ -72,7 +72,7 @@ export function ProductDetail() {
             <div className="detail-price">{money(listing.price)}</div>
           </div>
           <Link to={`/live/${seller.id}`} className="bid-live-note">
-            or bid live <strong>from $1</strong>
+            or bid live <strong>from ₹100</strong>
           </Link>
         </div>
 

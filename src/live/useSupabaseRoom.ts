@@ -173,7 +173,9 @@ export function useSupabaseRoom(seller: Seller, lots: Lot[], enabled: boolean): 
   /* ---- compose ---- */
 
   return useMemo<LiveRoom>(() => {
-    const waiting = !won && !isBidding;
+    // a lot that just sold shows SOLD (takes priority over the "awaiting bids" state)
+    const justSold = !won && snap?.status === 'ended';
+    const waiting = !won && !justSold && !isBidding;
     const lotIndex = won
       ? Math.max(0, lots.findIndex((l) => l.id === won.lot.id))
       : snap?.lotIndex ?? 0;
@@ -190,7 +192,7 @@ export function useSupabaseRoom(seller: Seller, lots: Lot[], enabled: boolean): 
         : null,
       youWin: won ? true : !waiting && snap?.bidder?.uid === uid,
       timeLeft: won ? 0 : snap?.timeLeft ?? 15,
-      status: won ? 'won' : waiting ? 'open' : snap?.status === 'ended' ? 'sold' : 'open',
+      status: won ? 'won' : justSold ? 'sold' : 'open',
       soldPrice: won ? won.price : snap?.soldPrice ?? null,
       chat: snap?.chat ?? [],
       viewers: Math.max(viewers, snap?.viewers ?? 0),

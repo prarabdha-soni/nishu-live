@@ -120,7 +120,8 @@ export function StudioServerless() {
           until this is pressed. */}
       {!host.bidding ? (
         <button className="btn-primary wide start-bid-btn" onClick={host.startBidding}>
-          <Icon name="gavel" size={20} /> Start bidding
+          <Icon name={state.status !== 'open' ? 'play_circle' : 'gavel'} size={20} />
+          {state.status !== 'open' ? ' Resume bidding' : ' Start bidding'}
         </button>
       ) : (
         <button className="btn-secondary wide start-bid-btn" onClick={host.pauseBidding}>
@@ -146,7 +147,13 @@ export function StudioServerless() {
         <div className="studio-state-row">
           <span>Clock</span>
           <strong>
-            {!host.bidding ? 'paused' : state.status === 'open' ? clockFmt(state.timeLeft) : 'ended'}
+            {host.bidding
+              ? state.status === 'open'
+                ? clockFmt(state.timeLeft)
+                : 'ended'
+              : state.status !== 'open'
+                ? 'sold'
+                : 'paused'}
           </strong>
         </div>
         <div className="studio-state-row">
@@ -154,12 +161,17 @@ export function StudioServerless() {
           <strong>{host.viewers}</strong>
         </div>
       </div>
-      {!host.bidding && (
-        <p className="screen-sub" style={{ marginTop: 10 }}>
-          Bidding is paused — viewers see “awaiting bids”. Tap <strong>Start bidding</strong> to open the
-          auction{host.live ? '.' : ' (you can go live first).'}
-        </p>
-      )}
+      {!host.bidding &&
+        (state.status !== 'open' ? (
+          <p className="screen-sub" style={{ marginTop: 10 }}>
+            <strong>{lot.name}</strong> sold. Tap <strong>Resume bidding</strong> to run the next lot.
+          </p>
+        ) : (
+          <p className="screen-sub" style={{ marginTop: 10 }}>
+            Bidding is paused — viewers see “awaiting bids”. Tap <strong>Start bidding</strong> to open the
+            auction{host.live ? '.' : ' (you can go live first).'}
+          </p>
+        ))}
 
       <h3 className="sub-title">Rival bots</h3>
       <div className="chip-row">
