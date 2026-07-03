@@ -3,7 +3,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 import type { Lot, Seller } from '../data/seed';
 import { getUid } from '../lib/identity';
 import { quickChips, type Bidder, type PaceName } from './engine';
-import { RTC_CONFIG } from './socket';
+import { boostSdp, RTC_CONFIG } from './socket';
 import { liveChannel, persistBid } from './supabase';
 import { useAuctionRoom, type AuctionRoom } from './useAuctionRoom';
 
@@ -173,14 +173,19 @@ export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled
       peersRef.current.set(viewerUid, pc);
       const stream = streamRef.current!;
       for (const track of stream.getTracks()) {
+        if (track.kind === 'video') track.contentHint = 'detail'; // preserve sharpness over motion
         const sender = pc.addTrack(track, stream);
+        const params = sender.getParameters();
+        if (!params.encodings || params.encodings.length === 0) params.encodings = [{}];
         if (track.kind === 'video') {
-          const params = sender.getParameters();
-          if (!params.encodings || params.encodings.length === 0) params.encodings = [{}];
-          params.encodings[0].maxBitrate = 2_500_000; // ~2.5 Mbps → crisp 720p
+          params.degradationPreference = 'maintain-resolution';
+          params.encodings[0].maxBitrate = 4_000_000; // ~4 Mbps → sharp 1080p
           params.encodings[0].maxFramerate = 30;
-          void sender.setParameters(params).catch(() => {});
+          params.encodings[0].scaleResolutionDownBy = 1;
+        } else {
+          params.encodings[0].maxBitrate = 128_000; // rich stereo Opus
         }
+        void sender.setParameters(params).catch(() => {});
       }
       pc.onicecandidate = (e) => {
         if (e.candidate) {
@@ -188,8 +193,8 @@ export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled
         }
       };
       const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-      void channel.send({ type: 'broadcast', event: 'rtc.offer', payload: { to: viewerUid, from: uid, sdp: offer } });
+      await pc.setLocalDescription({ type: offer.type, sdp: boostSdp(offer.sdp ?? '') });
+      void channel.send({ type: 'broadcast', event: 'rtc.offer', payload: { to: viewerUid, from: uid, sdp: pc.localDescription } });
     };
 
     return () => {

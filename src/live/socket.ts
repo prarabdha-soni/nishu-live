@@ -22,3 +22,31 @@ export function getSocket(): Socket {
 export const RTC_CONFIG: RTCConfiguration = {
   iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
 };
+
+/**
+ * Nudge the Opus audio codec to full-quality: stereo + in-band FEC + a higher
+ * average bitrate. Applied to both the offer and the answer so the seller's
+ * audio comes through rich instead of the default narrow-band voice.
+ */
+export function boostSdp(sdp: string): string {
+  const opusPt = sdp.match(/a=rtpmap:(\d+) opus\/48000/i)?.[1];
+  if (!opusPt) return sdp;
+  const ensure = (params: string) => {
+    const set = (k: string, v: string) =>
+      new RegExp(`${k}=`).test(params)
+        ? (params = params.replace(new RegExp(`${k}=[^;]*`), `${k}=${v}`))
+        : (params += `;${k}=${v}`);
+    set('stereo', '1');
+    set('sprop-stereo', '1');
+    set('maxaveragebitrate', '128000');
+    set('maxplaybackrate', '48000');
+    set('useinbandfec', '1');
+    return params;
+  };
+  const fmtp = new RegExp(`a=fmtp:${opusPt} ([^\\r\\n]*)`);
+  if (fmtp.test(sdp)) return sdp.replace(fmtp, (_l, p) => `a=fmtp:${opusPt} ${ensure(p)}`);
+  return sdp.replace(
+    new RegExp(`(a=rtpmap:${opusPt} opus/48000[^\\r\\n]*)`),
+    `$1\r\na=fmtp:${opusPt} stereo=1;sprop-stereo=1;maxaveragebitrate=128000;maxplaybackrate=48000;useinbandfec=1`,
+  );
+}

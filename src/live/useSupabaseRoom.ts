@@ -4,7 +4,7 @@ import type { ChatMessage, Lot, Seller } from '../data/seed';
 import { getColor, getHandle, getUid } from '../lib/identity';
 import { nextId } from '../lib/format';
 import { quickChips, type RoomState } from './engine';
-import { RTC_CONFIG } from './socket';
+import { boostSdp, RTC_CONFIG } from './socket';
 import { liveChannel } from './supabase';
 import type { LiveMode, LiveRoom } from './useLiveRoom';
 
@@ -99,8 +99,8 @@ export function useSupabaseRoom(seller: Seller, lots: Lot[], enabled: boolean): 
         };
         await pc.setRemoteDescription(payload.sdp);
         const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-        void channel.send({ type: 'broadcast', event: 'rtc.answer', payload: { to: payload.from, from: uid, sdp: answer } });
+        await pc.setLocalDescription({ type: answer.type, sdp: boostSdp(answer.sdp ?? '') });
+        void channel.send({ type: 'broadcast', event: 'rtc.answer', payload: { to: payload.from, from: uid, sdp: pc.localDescription } });
       })();
     });
 
