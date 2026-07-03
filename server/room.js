@@ -16,11 +16,8 @@ export const PACES = {
   Frenzy: { chatEvery: 1100, bidEvery: 1100, threshold: 0.82 },
 };
 
-export function inc(bid) {
-  if (bid < 50) return 5;
-  if (bid < 150) return 10;
-  if (bid < 400) return 20;
-  return 50;
+export function inc(_bid) {
+  return 100;
 }
 
 function pick(arr) {
@@ -190,7 +187,7 @@ export class AuctionRoom {
       userId: user.userId,
       handle: user.handle,
       color: user.color,
-      text: `bid $${amount.toLocaleString('en-US')}`,
+      text: `bid ₹${amount.toLocaleString('en-IN')}`,
       type: 'bid',
       isHost: !!user.isHost,
       ts: Date.now(),

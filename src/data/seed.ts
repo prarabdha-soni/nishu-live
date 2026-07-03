@@ -267,12 +267,12 @@ const BAGS_LOTS: Lot[] = [
 /* ---------------- listings (buy-now, mirror the lots) ---------------- */
 
 export const LISTINGS: Listing[] = [
-  { id: 'ls-signet', name: 'Sterling Silver Signet Ring', material: 'darksilver', metal: '925 Sterling', stone: 'Black Onyx', size: 'US 9', price: 135, imageUrl: '/assets/products/ring.jpg' },
-  { id: 'ls-moonstone', name: 'Moonstone Halo Pendant', material: 'pearl', metal: '925 Sterling', stone: 'Moonstone', size: '18" chain', price: 210, imageUrl: '/assets/products/pendant.jpg' },
-  { id: 'ls-amethyst', name: 'Amethyst Drop Earrings', material: 'amethyst', metal: '925 Sterling', stone: 'Amethyst', size: '1.4"', price: 110, imageUrl: '/assets/products/earrings.jpg' },
-  { id: 'ls-cuff', name: 'Oxidised Silver Cuff', material: 'silver', metal: '925 Sterling', stone: 'None', size: 'Adjustable', price: 175, imageUrl: '/assets/products/cuff.jpg' },
-  { id: 'ls-topaz', name: 'Blue Topaz Cocktail Ring', material: 'sapphire', metal: '925 Sterling', stone: 'Blue Topaz', size: 'US 7', price: 240, imageUrl: '/assets/products/cocktail.jpg' },
-  { id: 'ls-garnet', name: 'Garnet Charm Necklace', material: 'ruby', metal: '925 Sterling', stone: 'Garnet', size: '16" chain', price: 150, imageUrl: '/assets/products/necklace.jpg' },
+  { id: 'ls-signet', name: 'Sterling Silver Signet Ring', material: 'darksilver', metal: '925 Sterling', stone: 'Black Onyx', size: 'US 9', price: 1499, imageUrl: '/assets/products/ring.jpg' },
+  { id: 'ls-moonstone', name: 'Moonstone Halo Pendant', material: 'pearl', metal: '925 Sterling', stone: 'Moonstone', size: '18" chain', price: 2499, imageUrl: '/assets/products/pendant.jpg' },
+  { id: 'ls-amethyst', name: 'Amethyst Drop Earrings', material: 'amethyst', metal: '925 Sterling', stone: 'Amethyst', size: '1.4"', price: 1299, imageUrl: '/assets/products/earrings.jpg' },
+  { id: 'ls-cuff', name: 'Oxidised Silver Cuff', material: 'silver', metal: '925 Sterling', stone: 'None', size: 'Adjustable', price: 1799, imageUrl: '/assets/products/cuff.jpg' },
+  { id: 'ls-topaz', name: 'Blue Topaz Cocktail Ring', material: 'sapphire', metal: '925 Sterling', stone: 'Blue Topaz', size: 'US 7', price: 2999, imageUrl: '/assets/products/cocktail.jpg' },
+  { id: 'ls-garnet', name: 'Garnet Charm Necklace', material: 'ruby', metal: '925 Sterling', stone: 'Garnet', size: '16" chain', price: 1599, imageUrl: '/assets/products/necklace.jpg' },
 ];
 
 /* ---------------- sellers ---------------- */

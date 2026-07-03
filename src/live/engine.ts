@@ -1,13 +1,10 @@
 import type { ChatMessage, Lot } from '../data/seed';
 import { nextId } from '../lib/format';
 
-/* ---- bid increments (§7) ---- */
+/* ---- bid increment: flat ₹100 per bid ---- */
 
-export function inc(bid: number): number {
-  if (bid < 50) return 5;
-  if (bid < 150) return 10;
-  if (bid < 400) return 20;
-  return 50;
+export function inc(_bid: number): number {
+  return 100;
 }
 
 export function nextBidOf(state: Pick<RoomState, 'bidCount' | 'currentBid'>, lot: Lot): number {
