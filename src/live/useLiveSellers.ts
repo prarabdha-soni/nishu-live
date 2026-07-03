@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getSocket } from './socket';
 import { liveChannel, supabaseEnabled } from './supabase';
 
@@ -7,15 +7,20 @@ export interface LiveInfo {
   viewers: number;
 }
 
+// The host broadcasts a heartbeat every ~2.5s; treat a seller as live only while
+// those keep arriving. This debounces the flicker that presence 'sync' caused.
+const LIVE_TIMEOUT_MS = 7000;
+
 /**
  * Watches the live status of several sellers at once (for the Home feed).
- * Supabase mode: observes each seller's room channel (presence + state
- * broadcasts) without joining as a viewer. Socket mode: polls room snapshots.
- * A seller is "live" only while its host device is actually broadcasting.
+ * A seller is "live" only while its host keeps broadcasting `live: true`.
+ * We do NOT flip on presence sync (it flaps on reconnect) — we time out from
+ * the last live heartbeat instead, so the Home card stays stable.
  */
 export function useLiveSellers(ids: string[]): Record<string, LiveInfo> {
   const key = ids.join(',');
   const [map, setMap] = useState<Record<string, LiveInfo>>({});
+  const seenRef = useRef<Record<string, { at: number; live: boolean; viewers: number }>>({});
 
   useEffect(() => {
     const idList = key ? key.split(',') : [];
@@ -23,28 +28,33 @@ export function useLiveSellers(ids: string[]): Record<string, LiveInfo> {
     if (supabaseEnabled) {
       const channels = idList.map((id) => {
         const ch = liveChannel(id);
-        let hostPresent = false;
-        let live = false;
-        let viewers = 0;
-        const update = () => setMap((m) => ({ ...m, [id]: { live: hostPresent && live, viewers } }));
-
-        ch.on('presence', { event: 'sync' }, () => {
-          const entries = Object.values(ch.presenceState<{ role: string }>()).flat();
-          hostPresent = entries.some((e) => e.role === 'host');
-          viewers = entries.filter((e) => e.role === 'viewer').length;
-          if (!hostPresent) live = false; // host gone → not live
-          update();
-        });
         ch.on('broadcast', { event: 'auction.state' }, ({ payload }) => {
-          hostPresent = true;
-          live = !!payload?.live;
-          if (typeof payload?.viewers === 'number') viewers = payload.viewers;
-          update();
+          seenRef.current[id] = {
+            at: Date.now(),
+            live: !!payload?.live,
+            viewers: typeof payload?.viewers === 'number' ? payload.viewers : 0,
+          };
         });
         ch.subscribe();
         return ch;
       });
+
+      // recompute liveness on a steady tick, expiring stale heartbeats
+      const tick = setInterval(() => {
+        const now = Date.now();
+        setMap(() => {
+          const next: Record<string, LiveInfo> = {};
+          for (const id of idList) {
+            const s = seenRef.current[id];
+            const fresh = !!s && now - s.at < LIVE_TIMEOUT_MS;
+            next[id] = { live: fresh && s.live, viewers: fresh ? s.viewers : 0 };
+          }
+          return next;
+        });
+      }, 1500);
+
       return () => {
+        clearInterval(tick);
         channels.forEach((ch) => void ch.unsubscribe());
       };
     }

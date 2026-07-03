@@ -23,6 +23,8 @@ export interface HostRoom {
   viewers: number;
   live: boolean;
   bidding: boolean;
+  /** true if another device/tab is already hosting this same room */
+  hostConflict: boolean;
   ordersReceived: OrderAnnounce[];
   goLive: (stream: MediaStream) => void;
   endLive: () => void;
@@ -44,6 +46,7 @@ export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled
   const [viewers, setViewers] = useState(0);
   const [live, setLive] = useState(false);
   const [bidding, setBidding] = useState(false);
+  const [hostConflict, setHostConflict] = useState(false);
   const [ordersReceived, setOrdersReceived] = useState<OrderAnnounce[]>([]);
 
   // "Go live" only turns the camera on. The auction clock stays paused until the
@@ -143,6 +146,8 @@ export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled
       const count = entries.filter((e) => e.role === 'viewer').length;
       viewersRef.current = count;
       setViewers(count);
+      // warn if a second device/tab is hosting the same room (causes chaos)
+      setHostConflict(entries.some((e) => e.role === 'host' && e.uid !== uid));
       // a newly joined viewer needs the current state (incl. live status) right away
       broadcast();
       // close peer connections for viewers that left
@@ -167,7 +172,16 @@ export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled
       const pc = new RTCPeerConnection(RTC_CONFIG);
       peersRef.current.set(viewerUid, pc);
       const stream = streamRef.current!;
-      for (const track of stream.getTracks()) pc.addTrack(track, stream);
+      for (const track of stream.getTracks()) {
+        const sender = pc.addTrack(track, stream);
+        if (track.kind === 'video') {
+          const params = sender.getParameters();
+          if (!params.encodings || params.encodings.length === 0) params.encodings = [{}];
+          params.encodings[0].maxBitrate = 2_500_000; // ~2.5 Mbps → crisp 720p
+          params.encodings[0].maxFramerate = 30;
+          void sender.setParameters(params).catch(() => {});
+        }
+      }
       pc.onicecandidate = (e) => {
         if (e.candidate) {
           void channel.send({ type: 'broadcast', event: 'rtc.ice', payload: { to: viewerUid, from: uid, candidate: e.candidate } });
@@ -239,6 +253,7 @@ export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled
     viewers,
     live,
     bidding,
+    hostConflict,
     ordersReceived,
     goLive,
     endLive,

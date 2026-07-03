@@ -2251,6 +2251,21 @@
   margin-top: 8px;
 }
 
+.host-conflict {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #ffe9ea;
+  border: 1px solid #ffc2c5;
+  color: var(--live);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  border-radius: 14px;
+  padding: 11px 14px;
+  margin: 10px 0 2px;
+}
+
 .studio-controls .btn-primary,
 .studio-controls .btn-secondary {
   flex: 1;

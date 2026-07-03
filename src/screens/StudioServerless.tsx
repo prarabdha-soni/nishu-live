@@ -35,8 +35,13 @@ export function StudioServerless() {
     setError(null);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 720 } },
-        audio: true,
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          frameRate: { ideal: 30 },
+        },
+        audio: { echoCancellation: true, noiseSuppression: true },
       });
       streamRef.current = stream;
       if (videoRef.current) {
@@ -61,6 +66,14 @@ export function StudioServerless() {
           {host.channelReady ? 'supabase channel connected' : 'connecting to supabase…'}
         </span>
       </p>
+
+      {host.hostConflict && (
+        <div className="host-conflict">
+          <Icon name="warning" filled size={18} />
+          Another device or tab is already hosting this room. Close it — running two studios for the same
+          seller makes the auction jump around.
+        </div>
+      )}
 
       <h3 className="sub-title" style={{ marginTop: 4 }}>
         Go live as
