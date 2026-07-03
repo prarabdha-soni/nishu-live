@@ -173,17 +173,18 @@ export function useHostRoom(seller: Seller, lots: Lot[], pace: HostPace, enabled
       peersRef.current.set(viewerUid, pc);
       const stream = streamRef.current!;
       for (const track of stream.getTracks()) {
-        if (track.kind === 'video') track.contentHint = 'detail'; // preserve sharpness over motion
+        if (track.kind === 'video') track.contentHint = 'detail'; // favour sharpness for products
         const sender = pc.addTrack(track, stream);
         const params = sender.getParameters();
         if (!params.encodings || params.encodings.length === 0) params.encodings = [{}];
         if (track.kind === 'video') {
-          params.degradationPreference = 'maintain-resolution';
-          params.encodings[0].maxBitrate = 4_000_000; // ~4 Mbps → sharp 1080p
+          // mesh sends one copy per viewer, so cap per-viewer bitrate and let it
+          // adapt down (resolution + framerate) under congestion to stay smooth.
+          params.degradationPreference = 'balanced';
+          params.encodings[0].maxBitrate = 1_800_000; // ~1.8 Mbps 720p
           params.encodings[0].maxFramerate = 30;
-          params.encodings[0].scaleResolutionDownBy = 1;
         } else {
-          params.encodings[0].maxBitrate = 128_000; // rich stereo Opus
+          params.encodings[0].maxBitrate = 128_000; // rich stereo Opus (cheap per viewer)
         }
         void sender.setParameters(params).catch(() => {});
       }
