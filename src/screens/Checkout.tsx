@@ -5,6 +5,7 @@ import { CURRENT_USER, type Material } from '../data/seed';
 import { arrivingDate, money, orderNumber } from '../lib/format';
 import { getHandle } from '../lib/identity';
 import { announceOrder } from '../live/supabase';
+import { addNotification, createOrder } from '../api/supastore';
 import { useAppStore } from '../store/store';
 
 export function Checkout() {
@@ -28,6 +29,18 @@ export function Checkout() {
       item,
       arriving: arrivingDate(),
       placedAt: Date.now(),
+    });
+    // persist the order + an activity notification (Supabase, local fallback)
+    void createOrder({
+      title: item.title,
+      imageUrl: item.imageUrl ?? null,
+      amount: item.price,
+      kind: item.won ? 'won' : 'bought',
+    });
+    void addNotification({
+      type: item.won ? 'won' : 'order',
+      title: item.won ? 'You won a lot!' : 'Order confirmed',
+      sub: `${item.title} · ${money(item.price)}`,
     });
     // dummy payment: tell the live host their sale went through
     if (item.won) {

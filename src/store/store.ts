@@ -21,24 +21,23 @@ export interface Order {
 
 interface AppState {
   follows: string[]; // seller ids
-  saved: string[]; // listing ids
   checkoutItem: CheckoutItem | null;
   lastOrder: Order | null;
   application: SellerApplication | null;
 
   toggleFollow: (sellerId: string) => void;
   isFollowing: (sellerId: string) => boolean;
-  toggleSaved: (listingId: string) => void;
   setCheckoutItem: (item: CheckoutItem | null) => void;
   placeOrder: (order: Order) => void;
   submitApplication: (app: SellerApplication) => void;
 }
 
+// Transient/local UI state. Persistent user data (orders, saved, profile,
+// notifications) lives in Supabase — see src/api/supastore.ts.
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       follows: ['jewel_daily'],
-      saved: [],
       checkoutItem: null,
       lastOrder: null,
       application: null,
@@ -52,13 +51,6 @@ export const useAppStore = create<AppState>()(
 
       isFollowing: (sellerId) => get().follows.includes(sellerId),
 
-      toggleSaved: (listingId) =>
-        set((s) => ({
-          saved: s.saved.includes(listingId)
-            ? s.saved.filter((id) => id !== listingId)
-            : [...s.saved, listingId],
-        })),
-
       setCheckoutItem: (item) => set({ checkoutItem: item }),
 
       placeOrder: (order) => set({ lastOrder: order, checkoutItem: null }),
@@ -67,7 +59,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'nishu-store',
-      partialize: (s) => ({ follows: s.follows, saved: s.saved, application: s.application }),
+      partialize: (s) => ({ follows: s.follows, application: s.application }),
     },
   ),
 );

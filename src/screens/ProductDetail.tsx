@@ -3,6 +3,8 @@ import { Icon } from '../components/Icon';
 import { ProductImage } from '../components/ProductImage';
 import { FLAGSHIP_SELLER_ID, LISTINGS, getSeller } from '../data/seed';
 import { money } from '../lib/format';
+import { addNotification } from '../api/supastore';
+import { useSaved } from '../api/hooks';
 import { useAppStore } from '../store/store';
 
 export function ProductDetail() {
@@ -11,9 +13,15 @@ export function ProductDetail() {
   const listing = LISTINGS.find((l) => l.id === id) ?? LISTINGS[0];
   const seller = getSeller(FLAGSHIP_SELLER_ID);
 
-  const saved = useAppStore((s) => s.saved.includes(listing.id));
-  const toggleSaved = useAppStore((s) => s.toggleSaved);
+  const { toggle, isSaved } = useSaved();
+  const saved = isSaved(listing.id);
   const setCheckoutItem = useAppStore((s) => s.setCheckoutItem);
+
+  const onToggleSave = () => {
+    const willSave = !saved;
+    toggle({ productId: listing.id, name: listing.name, price: listing.price, imageUrl: listing.imageUrl ?? null });
+    if (willSave) void addNotification({ type: 'saved', title: 'Saved to your list', sub: listing.name });
+  };
 
   const buyNow = () => {
     setCheckoutItem({
@@ -42,7 +50,7 @@ export function ProductDetail() {
           <button
             className={`glass-btn on-light ${saved ? 'saved' : ''}`}
             aria-label={saved ? 'Remove from saved' : 'Save'}
-            onClick={() => toggleSaved(listing.id)}
+            onClick={onToggleSave}
           >
             <Icon name="favorite" filled={saved} />
           </button>
