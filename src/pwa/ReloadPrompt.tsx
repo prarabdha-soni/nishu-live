@@ -1,22 +1,24 @@
+import { useEffect } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
+/**
+ * Auto-apply new deploys: as soon as a new service worker is ready, update and
+ * reload so users never get stuck on a stale cached bundle. Also checks for a
+ * new version every 60s while the tab is open.
+ */
 export function ReloadPrompt() {
   const {
-    needRefresh: [needRefresh, setNeedRefresh],
+    needRefresh: [needRefresh],
     updateServiceWorker,
-  } = useRegisterSW();
+  } = useRegisterSW({
+    onRegisteredSW(_url, registration) {
+      if (registration) setInterval(() => registration.update(), 60_000);
+    },
+  });
 
-  if (!needRefresh) return null;
+  useEffect(() => {
+    if (needRefresh) void updateServiceWorker(true);
+  }, [needRefresh, updateServiceWorker]);
 
-  return (
-    <div className="sw-toast" role="status">
-      <span>Update available</span>
-      <button className="sw-refresh" onClick={() => updateServiceWorker(true)}>
-        Refresh
-      </button>
-      <button className="sw-dismiss" aria-label="Dismiss" onClick={() => setNeedRefresh(false)}>
-        ✕
-      </button>
-    </div>
-  );
+  return null;
 }

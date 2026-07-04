@@ -2,9 +2,9 @@
 // The server owns the clock (endsAt timestamp) and validates every bid.
 import { BOTS, BOT_MESSAGES, HOST_MESSAGES } from './lots.js';
 
-export const LOT_MS = 15_000;
-const ANTI_SNIPE_WINDOW_MS = 6_000;
-const ANTI_SNIPE_RESET_MS = 8_000;
+export const LOT_MS = 30_000;
+const ANTI_SNIPE_WINDOW_MS = 8_000;
+const ANTI_SNIPE_RESET_MS = 12_000;
 const NEXT_LOT_DELAY_MS = 2_800;
 const BROADCAST_MS = 250; // ≥ 4×/sec
 const CHAT_CAP = 40;

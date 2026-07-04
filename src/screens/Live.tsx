@@ -109,8 +109,8 @@ export function Live() {
       {rulesOpen && (
         <div className="rules-pop" role="dialog" aria-label="Auction rules">
           <h4>How bidding works</h4>
-          <p>Every lot starts low and runs a 15-second clock. Tap a chip to bid the next amount.</p>
-          <p>Any bid in the final 6 seconds resets the clock to 8 — no sniping.</p>
+          <p>Every lot starts low and runs a 30-second clock. Tap a chip to bid the next amount.</p>
+          <p>Any bid in the final 8 seconds resets the clock — no sniping.</p>
           <p>Top bidder when the clock hits zero wins and pays exactly that bid. Shipping is free and insured.</p>
           <button className="rules-close" onClick={() => setRulesOpen(false)}>
             Got it

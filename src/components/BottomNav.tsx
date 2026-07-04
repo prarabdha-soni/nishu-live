@@ -3,7 +3,7 @@ import { Icon } from './Icon';
 
 const TABS = [
   { to: '/', icon: 'home', label: 'Home' },
-  { to: '/shop', icon: 'storefront', label: 'Shop' },
+  { to: '/shop', icon: 'grid_view', label: 'Categories' },
   { to: '/activity', icon: 'notifications', label: 'Activity' },
   { to: '/account', icon: 'person', label: 'Account' },
 ];

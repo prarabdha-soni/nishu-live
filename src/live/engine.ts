@@ -32,9 +32,9 @@ export const PACES: Record<PaceName, Pace> = {
   Frenzy: { chatEvery: 1100, bidEvery: 1100, threshold: 0.82 },
 };
 
-export const LOT_SECONDS = 15;
-const ANTI_SNIPE_WINDOW = 6;
-const ANTI_SNIPE_RESET = 8;
+export const LOT_SECONDS = 30;
+const ANTI_SNIPE_WINDOW = 8;
+const ANTI_SNIPE_RESET = 12;
 
 /* ---- room state ---- */
 
